@@ -1,0 +1,2999 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WorkFlow Pro - Advanced Worker Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: {
+                50: "#eff6ff",
+                500: "#3b82f6",
+                600: "#2563eb",
+                700: "#1d4ed8",
+                900: "#1e3a8a",
+              },
+            },
+            animation: {
+              "fade-in": "fadeIn 0.5s ease-out",
+              "slide-up": "slideUp 0.4s ease-out",
+              "slide-down": "slideDown 0.4s ease-out",
+              "scale-in": "scaleIn 0.3s ease-out",
+              "bounce-gentle": "bounceGentle 0.6s ease-out",
+              "pulse-slow": "pulse 3s infinite",
+              gradient: "gradient 6s ease infinite",
+            },
+            backgroundImage: {
+              "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
+              "gradient-conic":
+                "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes slideDown {
+        from {
+          opacity: 0;
+          transform: translateY(-30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes scaleIn {
+        from {
+          opacity: 0;
+          transform: scale(0.9);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+      @keyframes bounceGentle {
+        0%,
+        20%,
+        53%,
+        80%,
+        100% {
+          transform: translate3d(0, 0, 0);
+        }
+        40%,
+        43% {
+          transform: translate3d(0, -8px, 0);
+        }
+        70% {
+          transform: translate3d(0, -4px, 0);
+        }
+        90% {
+          transform: translate3d(0, -2px, 0);
+        }
+      }
+      @keyframes gradient {
+        0%,
+        100% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+      }
+      .glass-effect {
+        backdrop-filter: blur(16px);
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+      .dark .glass-effect {
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .gradient-bg {
+        background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #f5576c);
+        background-size: 400% 400%;
+        animation: gradient 15s ease infinite;
+      }
+      .card-hover {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .card-hover:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+          0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      }
+      .dark .card-hover:hover {
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3),
+          0 10px 10px -5px rgba(0, 0, 0, 0.2);
+      }
+      .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+      .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+      }
+      .stat-card {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.1) 0%,
+          rgba(255, 255, 255, 0.05) 100%
+        );
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .dark .stat-card {
+        background: linear-gradient(
+          135deg,
+          rgba(0, 0, 0, 0.2) 0%,
+          rgba(0, 0, 0, 0.1) 100%
+        );
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+    </style>
+  </head>
+  <body
+    class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-blue-900 dark:to-indigo-900 min-h-screen transition-all duration-500"
+  >
+    <!-- Floating Background Elements -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+      <div
+        class="absolute -top-40 -right-40 w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse-slow"
+      ></div>
+      <div
+        class="absolute -bottom-40 -left-40 w-80 h-80 bg-yellow-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse-slow"
+        style="animation-delay: 2s"
+      ></div>
+      <div
+        class="absolute top-40 left-40 w-80 h-80 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse-slow"
+        style="animation-delay: 4s"
+      ></div>
+    </div>
+
+    <!-- Header -->
+    <header
+      class="relative z-10 glass-effect border-b border-white/20 dark:border-gray-700/50"
+    >
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center py-4">
+          <div class="flex items-center space-x-4">
+            <div
+              class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center"
+            >
+              <i class="fas fa-users text-white text-lg"></i>
+            </div>
+            <div>
+              <h1
+                class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
+              >
+                WorkFlow Pro
+              </h1>
+              <p class="text-sm text-gray-600 dark:text-gray-400">
+                Advanced Worker Management System
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center space-x-4">
+            <div
+              class="hidden md:flex items-center space-x-2 bg-white/20 dark:bg-gray-800/20 rounded-full px-4 py-2"
+            >
+              <i class="fas fa-clock text-blue-500"></i>
+              <span
+                id="currentTime"
+                class="text-sm font-medium text-gray-700 dark:text-gray-300"
+              ></span>
+            </div>
+            <button
+              id="themeToggle"
+              class="p-3 rounded-xl bg-white/20 dark:bg-gray-800/20 hover:bg-white/30 dark:hover:bg-gray-700/30 transition-all duration-300 group"
+            >
+              <i
+                class="fas fa-moon dark:hidden text-gray-700 group-hover:scale-110 transition-transform"
+              ></i>
+              <i
+                class="fas fa-sun hidden dark:inline text-yellow-400 group-hover:scale-110 transition-transform"
+              ></i>
+            </button>
+            <button
+              id="notificationBtn"
+              class="relative p-3 rounded-xl bg-white/20 dark:bg-gray-800/20 hover:bg-white/30 dark:hover:bg-gray-700/30 transition-all duration-300"
+            >
+              <i class="fas fa-bell text-gray-700 dark:text-gray-300"></i>
+              <span
+                id="notificationBadge"
+                class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center hidden"
+                >0</span
+              >
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <!-- Dashboard Stats -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="stat-card rounded-2xl p-6 card-hover animate-fade-in">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
+                Total Workers
+              </p>
+              <p
+                id="totalWorkersCount"
+                class="text-3xl font-bold text-gray-900 dark:text-white"
+              >
+                0
+              </p>
+            </div>
+            <div
+              class="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center"
+            >
+              <i class="fas fa-users text-white text-xl"></i>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="stat-card rounded-2xl p-6 card-hover animate-fade-in"
+          style="animation-delay: 0.1s"
+        >
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
+                Active Days
+              </p>
+              <p
+                id="activeDaysCount"
+                class="text-3xl font-bold text-gray-900 dark:text-white"
+              >
+                0
+              </p>
+            </div>
+            <div
+              class="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center"
+            >
+              <i class="fas fa-calendar-check text-white text-xl"></i>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="stat-card rounded-2xl p-6 card-hover animate-fade-in"
+          style="animation-delay: 0.2s"
+        >
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
+                Total Earnings
+              </p>
+              <p
+                id="totalEarningsAmount"
+                class="text-3xl font-bold text-gray-900 dark:text-white"
+              >
+                0
+              </p>
+            </div>
+            <div
+              class="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center"
+            >
+              <i class="fas fa-coins text-white text-xl"></i>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="stat-card rounded-2xl p-6 card-hover animate-fade-in"
+          style="animation-delay: 0.3s"
+        >
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
+                Pending Payments
+              </p>
+              <p
+                id="pendingPaymentsAmount"
+                class="text-3xl font-bold text-gray-900 dark:text-white"
+              >
+                0
+              </p>
+            </div>
+            <div
+              class="w-12 h-12 bg-red-500 rounded-xl flex items-center justify-center"
+            >
+              <i class="fas fa-exclamation-triangle text-white text-xl"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <div class="mb-8">
+        <nav
+          class="flex space-x-2 bg-white/30 dark:bg-gray-800/30 backdrop-filter backdrop-blur-lg p-2 rounded-2xl border border-white/20 dark:border-gray-700/50"
+        >
+          <button
+            class="tab-btn active flex items-center space-x-2 px-6 py-3 rounded-xl text-sm font-medium transition-all duration-300"
+            data-tab="dashboard"
+          >
+            <i class="fas fa-chart-line"></i>
+            <span>Dashboard</span>
+          </button>
+          <button
+            class="tab-btn flex items-center space-x-2 px-6 py-3 rounded-xl text-sm font-medium transition-all duration-300"
+            data-tab="workers"
+          >
+            <i class="fas fa-users"></i>
+            <span>Workers</span>
+          </button>
+          <button
+            class="tab-btn flex items-center space-x-2 px-6 py-3 rounded-xl text-sm font-medium transition-all duration-300"
+            data-tab="schedule"
+          >
+            <i class="fas fa-calendar-alt"></i>
+            <span>Schedule</span>
+          </button>
+          <button
+            class="tab-btn flex items-center space-x-2 px-6 py-3 rounded-xl text-sm font-medium transition-all duration-300"
+            data-tab="payments"
+          >
+            <i class="fas fa-credit-card"></i>
+            <span>Payments</span>
+          </button>
+          <button
+            class="tab-btn flex items-center space-x-2 px-6 py-3 rounded-xl text-sm font-medium transition-all duration-300"
+            data-tab="revenue"
+          >
+            <i class="fas fa-chart-pie"></i>
+            <span>Revenue</span>
+          </button>
+          <button
+            class="tab-btn flex items-center space-x-2 px-6 py-3 rounded-xl text-sm font-medium transition-all duration-300"
+            data-tab="analytics"
+          >
+            <i class="fas fa-analytics"></i>
+            <span>Analytics</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Dashboard Tab -->
+      <div id="dashboard-tab" class="tab-content">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <!-- Recent Activity -->
+          <div class="glass-effect rounded-2xl p-6 animate-fade-in">
+            <div class="flex items-center justify-between mb-6">
+              <h2
+                class="text-xl font-semibold text-gray-900 dark:text-white flex items-center space-x-2"
+              >
+                <i class="fas fa-clock text-blue-500"></i>
+                <span>Recent Activity</span>
+              </h2>
+              <button
+                class="text-blue-500 hover:text-blue-600 text-sm font-medium"
+              >
+                View All
+              </button>
+            </div>
+            <div
+              id="recentActivity"
+              class="space-y-4 max-h-80 overflow-y-auto scrollbar-hide"
+            >
+              <!-- Activity items will be populated here -->
+            </div>
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="glass-effect rounded-2xl p-6 animate-fade-in">
+            <h2
+              class="text-xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center space-x-2"
+            >
+              <i class="fas fa-bolt text-yellow-500"></i>
+              <span>Quick Actions</span>
+            </h2>
+            <div class="grid grid-cols-2 gap-4">
+              <button
+                id="quickAddWorker"
+                class="p-4 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl transition-all duration-300 transform hover:scale-105"
+              >
+                <i class="fas fa-user-plus text-2xl mb-2"></i>
+                <p class="font-medium">Add Worker</p>
+              </button>
+              <button
+                id="quickAddDay"
+                class="p-4 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-xl transition-all duration-300 transform hover:scale-105"
+              >
+                <i class="fas fa-calendar-plus text-2xl mb-2"></i>
+                <p class="font-medium">Add Day</p>
+              </button>
+              <button
+                id="quickPayment"
+                class="p-4 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white rounded-xl transition-all duration-300 transform hover:scale-105"
+              >
+                <i class="fas fa-money-bill-wave text-2xl mb-2"></i>
+                <p class="font-medium">Make Payment</p>
+              </button>
+              <button
+                id="quickRevenue"
+                class="p-4 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-xl transition-all duration-300 transform hover:scale-105"
+              >
+                <i class="fas fa-chart-line text-2xl mb-2"></i>
+                <p class="font-medium">Add Revenue</p>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Performance Chart -->
+        <div class="mt-8 glass-effect rounded-2xl p-6 animate-fade-in">
+          <h2
+            class="text-xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center space-x-2"
+          >
+            <i class="fas fa-chart-area text-green-500"></i>
+            <span>Performance Overview</span>
+          </h2>
+          <div
+            id="performanceChart"
+            class="h-64 flex items-center justify-center text-gray-500 dark:text-gray-400"
+          >
+            <div class="text-center">
+              <i class="fas fa-chart-line text-4xl mb-4 opacity-50"></i>
+              <p>Performance data will appear here as you add more work days</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Workers Tab -->
+      <div id="workers-tab" class="tab-content hidden">
+        <div class="glass-effect rounded-2xl p-6 mb-6 animate-fade-in">
+          <div
+            class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6"
+          >
+            <div>
+              <h2
+                class="text-2xl font-bold text-gray-900 dark:text-white flex items-center space-x-2"
+              >
+                <i class="fas fa-users text-blue-500"></i>
+                <span>Worker Management</span>
+              </h2>
+              <p class="text-gray-600 dark:text-gray-400 mt-1">
+                Manage your team members and their compensation
+              </p>
+            </div>
+            <div class="flex space-x-3">
+              <button
+                id="exportWorkers"
+                class="flex items-center space-x-2 px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-xl transition-all duration-300"
+              >
+                <i class="fas fa-download"></i>
+                <span>Export</span>
+              </button>
+              <button
+                id="addWorkerBtn"
+                class="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl transition-all duration-300 transform hover:scale-105"
+              >
+                <i class="fas fa-plus"></i>
+                <span>Add Worker</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Search and Filter -->
+          <div class="flex flex-col sm:flex-row gap-4 mb-6">
+            <div class="flex-1 relative">
+              <i
+                class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+              ></i>
+              <input
+                type="text"
+                id="workerSearch"
+                placeholder="Search workers..."
+                class="w-full pl-10 pr-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+              />
+            </div>
+            <select
+              id="workerFilter"
+              class="px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+            >
+              <option value="all">All Workers</option>
+              <option value="percentage">Percentage Workers</option>
+              <option value="daily">Daily Workers</option>
+              <option value="pending">Pending Payments</option>
+            </select>
+          </div>
+
+          <div
+            id="workersList"
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          ></div>
+        </div>
+      </div>
+
+      <!-- Schedule Tab -->
+      <div id="schedule-tab" class="tab-content hidden">
+        <div class="glass-effect rounded-2xl p-6 mb-6 animate-fade-in">
+          <div
+            class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6"
+          >
+            <div>
+              <h2
+                class="text-2xl font-bold text-gray-900 dark:text-white flex items-center space-x-2"
+              >
+                <i class="fas fa-calendar-alt text-green-500"></i>
+                <span>Work Schedule</span>
+              </h2>
+              <p class="text-gray-600 dark:text-gray-400 mt-1">
+                Track daily work assignments and attendance
+              </p>
+            </div>
+            <div class="flex space-x-3">
+              <button
+                id="calendarView"
+                class="flex items-center space-x-2 px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-xl transition-all duration-300"
+              >
+                <i class="fas fa-calendar"></i>
+                <span>Calendar</span>
+              </button>
+              <button
+                id="addDayBtn"
+                class="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-xl transition-all duration-300 transform hover:scale-105"
+              >
+                <i class="fas fa-plus"></i>
+                <span>Add Day</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Date Range Filter -->
+          <div class="flex flex-col sm:flex-row gap-4 mb-6">
+            <div class="flex items-center space-x-2">
+              <label
+                class="text-sm font-medium text-gray-700 dark:text-gray-300"
+                >From:</label
+              >
+              <input
+                type="date"
+                id="dateFrom"
+                class="px-3 py-2 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div class="flex items-center space-x-2">
+              <label
+                class="text-sm font-medium text-gray-700 dark:text-gray-300"
+                >To:</label
+              >
+              <input
+                type="date"
+                id="dateTo"
+                class="px-3 py-2 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <button
+              id="filterDates"
+              class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
+            >
+              <i class="fas fa-filter mr-2"></i>Filter
+            </button>
+          </div>
+
+          <!-- Pagination Controls -->
+          <div class="flex justify-between items-center mb-6">
+            <div class="text-sm text-gray-600 dark:text-gray-400">
+              Page <span id="currentPage" class="font-semibold">1</span> of
+              <span id="totalPages" class="font-semibold">1</span> (<span
+                id="totalRecords"
+                >0</span
+              >
+              records)
+            </div>
+            <div class="flex space-x-2">
+              <button
+                id="prevPage"
+                class="px-4 py-2 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-white/70 dark:hover:bg-gray-700/50 transition-all duration-300 disabled:opacity-50"
+              >
+                <i class="fas fa-chevron-left"></i>
+              </button>
+              <button
+                id="nextPage"
+                class="px-4 py-2 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-white/70 dark:hover:bg-gray-700/50 transition-all duration-300 disabled:opacity-50"
+              >
+                <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+
+          <div
+            id="scheduleTable"
+            class="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-700"
+          ></div>
+
+          <!-- Summary Cards -->
+          <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="stat-card rounded-xl p-6">
+              <div class="flex items-center space-x-3">
+                <div
+                  class="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center"
+                >
+                  <i class="fas fa-calendar-day text-white"></i>
+                </div>
+                <div>
+                  <h3 class="font-semibold text-gray-900 dark:text-white">
+                    Total Days
+                  </h3>
+                  <p
+                    id="totalDays"
+                    class="text-2xl font-bold text-blue-600 dark:text-blue-400"
+                  >
+                    0
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="stat-card rounded-xl p-6">
+              <div class="flex items-center space-x-3">
+                <div
+                  class="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center"
+                >
+                  <i class="fas fa-money-bill-wave text-white"></i>
+                </div>
+                <div>
+                  <h3 class="font-semibold text-gray-900 dark:text-white">
+                    Daily Wages
+                  </h3>
+                  <p
+                    id="totalWages"
+                    class="text-2xl font-bold text-green-600 dark:text-green-400"
+                  >
+                    0
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="stat-card rounded-xl p-6">
+              <div class="flex items-center space-x-3">
+                <div
+                  class="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center"
+                >
+                  <i class="fas fa-users text-white"></i>
+                </div>
+                <div>
+                  <h3 class="font-semibold text-gray-900 dark:text-white">
+                    Active Workers
+                  </h3>
+                  <p
+                    id="activeWorkers"
+                    class="text-2xl font-bold text-purple-600 dark:text-purple-400"
+                  >
+                    0
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payments Tab -->
+      <div id="payments-tab" class="tab-content hidden">
+        <div class="glass-effect rounded-2xl p-6 mb-6 animate-fade-in">
+          <div
+            class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6"
+          >
+            <div>
+              <h2
+                class="text-2xl font-bold text-gray-900 dark:text-white flex items-center space-x-2"
+              >
+                <i class="fas fa-credit-card text-purple-500"></i>
+                <span>Payment Management</span>
+              </h2>
+              <p class="text-gray-600 dark:text-gray-400 mt-1">
+                Process payments and track financial records
+              </p>
+            </div>
+            <div class="flex space-x-3">
+              <button
+                id="paymentReport"
+                class="flex items-center space-x-2 px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-xl transition-all duration-300"
+              >
+                <i class="fas fa-file-alt"></i>
+                <span>Report</span>
+              </button>
+              <button
+                id="bulkPayment"
+                class="flex items-center space-x-2 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-xl transition-all duration-300"
+              >
+                <i class="fas fa-layer-group"></i>
+                <span>Bulk Pay</span>
+              </button>
+            </div>
+          </div>
+          <div id="paymentsList" class="space-y-6"></div>
+        </div>
+      </div>
+
+      <!-- Revenue Tab -->
+      <div id="revenue-tab" class="tab-content hidden">
+        <div class="glass-effect rounded-2xl p-6 mb-6 animate-fade-in">
+          <div
+            class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6"
+          >
+            <div>
+              <h2
+                class="text-2xl font-bold text-gray-900 dark:text-white flex items-center space-x-2"
+              >
+                <i class="fas fa-chart-pie text-orange-500"></i>
+                <span>Revenue Distribution</span>
+              </h2>
+              <p class="text-gray-600 dark:text-gray-400 mt-1">
+                Manage income and percentage-based distributions
+              </p>
+            </div>
+            <button
+              id="addRevenueBtn"
+              class="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-xl transition-all duration-300 transform hover:scale-105"
+            >
+              <i class="fas fa-plus"></i>
+              <span>Add Revenue</span>
+            </button>
+          </div>
+          <div id="revenueList" class="space-y-6"></div>
+        </div>
+      </div>
+
+      <!-- Analytics Tab -->
+      <div id="analytics-tab" class="tab-content hidden">
+        <div class="glass-effect rounded-2xl p-6 mb-6 animate-fade-in">
+          <div
+            class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6"
+          >
+            <div>
+              <h2
+                class="text-2xl font-bold text-gray-900 dark:text-white flex items-center space-x-2"
+              >
+                <i class="fas fa-analytics text-indigo-500"></i>
+                <span>Analytics & Insights</span>
+              </h2>
+              <p class="text-gray-600 dark:text-gray-400 mt-1">
+                Detailed analysis and performance metrics
+              </p>
+            </div>
+            <div class="flex space-x-3">
+              <select
+                id="analyticsTimeframe"
+                class="px-4 py-2 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl"
+              >
+                <option value="7">Last 7 days</option>
+                <option value="30">Last 30 days</option>
+                <option value="90">Last 3 months</option>
+                <option value="365">Last year</option>
+              </select>
+              <button
+                id="exportAnalytics"
+                class="flex items-center space-x-2 px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl transition-all duration-300"
+              >
+                <i class="fas fa-download"></i>
+                <span>Export</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Analytics Content -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="space-y-6">
+              <!-- Worker Performance -->
+              <div class="bg-white/50 dark:bg-gray-800/50 rounded-xl p-6">
+                <h3
+                  class="text-lg font-semibold text-gray-900 dark:text-white mb-4"
+                >
+                  Worker Performance
+                </h3>
+                <div id="workerPerformance" class="space-y-3"></div>
+              </div>
+
+              <!-- Payment Trends -->
+              <div class="bg-white/50 dark:bg-gray-800/50 rounded-xl p-6">
+                <h3
+                  class="text-lg font-semibold text-gray-900 dark:text-white mb-4"
+                >
+                  Payment Trends
+                </h3>
+                <div
+                  id="paymentTrends"
+                  class="h-48 flex items-center justify-center text-gray-500"
+                >
+                  <p>Payment trend chart will appear here</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-6">
+              <!-- Revenue Breakdown -->
+              <div class="bg-white/50 dark:bg-gray-800/50 rounded-xl p-6">
+                <h3
+                  class="text-lg font-semibold text-gray-900 dark:text-white mb-4"
+                >
+                  Revenue Breakdown
+                </h3>
+                <div id="revenueBreakdown" class="space-y-3"></div>
+              </div>
+
+              <!-- Efficiency Metrics -->
+              <div class="bg-white/50 dark:bg-gray-800/50 rounded-xl p-6">
+                <h3
+                  class="text-lg font-semibold text-gray-900 dark:text-white mb-4"
+                >
+                  Efficiency Metrics
+                </h3>
+                <div
+                  id="efficiencyMetrics"
+                  class="grid grid-cols-2 gap-4"
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Enhanced Modals with better animations and design -->
+
+    <!-- Add Worker Modal -->
+    <div
+      id="workerModal"
+      class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4"
+    >
+      <div
+        class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full animate-scale-in border border-gray-200 dark:border-gray-700"
+      >
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h3
+              class="text-xl font-bold text-gray-900 dark:text-white flex items-center space-x-2"
+            >
+              <i class="fas fa-user-plus text-blue-500"></i>
+              <span>Add New Worker</span>
+            </h3>
+            <button
+              id="closeWorkerModal"
+              class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+            >
+              <i class="fas fa-times text-xl"></i>
+            </button>
+          </div>
+          <form id="workerForm" class="space-y-6">
+            <div>
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
+                <i class="fas fa-user mr-2"></i>Full Name
+              </label>
+              <input
+                type="text"
+                id="workerName"
+                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all duration-300"
+                placeholder="Enter worker's full name"
+                required
+              />
+            </div>
+            <div>
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
+                <i class="fas fa-briefcase mr-2"></i>Compensation Type
+              </label>
+              <select
+                id="workerType"
+                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all duration-300"
+              >
+                <option value="percentage">Percentage-based</option>
+                <option value="daily">Daily Wage</option>
+              </select>
+            </div>
+            <div>
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
+                <i class="fas fa-money-bill-wave mr-2"></i>Amount
+              </label>
+              <input
+                type="number"
+                id="workerAmount"
+                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all duration-300"
+                placeholder="Enter amount"
+                required
+              />
+              <p id="amountHint" class="text-xs text-gray-500 mt-2">
+                Enter percentage (e.g., 50) or daily wage in Tomans
+              </p>
+            </div>
+            <div class="flex space-x-3 pt-4">
+              <button
+                type="submit"
+                class="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-3 rounded-xl transition-all duration-300 transform hover:scale-105 font-medium"
+              >
+                <i class="fas fa-plus mr-2"></i>Add Worker
+              </button>
+              <button
+                type="button"
+                id="cancelWorker"
+                class="flex-1 bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-200 py-3 rounded-xl transition-all duration-300 font-medium"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Day Modal -->
+    <div
+      id="dayModal"
+      class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4"
+    >
+      <div
+        class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full animate-scale-in border border-gray-200 dark:border-gray-700 max-h-[90vh] overflow-y-auto"
+      >
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h3
+              class="text-xl font-bold text-gray-900 dark:text-white flex items-center space-x-2"
+            >
+              <i class="fas fa-calendar-plus text-green-500"></i>
+              <span>Add Work Day</span>
+            </h3>
+            <button
+              id="closeDayModal"
+              class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+            >
+              <i class="fas fa-times text-xl"></i>
+            </button>
+          </div>
+          <form id="dayForm" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label
+                  class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                >
+                  <i class="fas fa-calendar mr-2"></i>Date
+                </label>
+                <input
+                  type="date"
+                  id="workDate"
+                  class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all duration-300"
+                  required
+                />
+              </div>
+              <div>
+                <label
+                  class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                >
+                  <i class="fas fa-clock mr-2"></i>Day Type
+                </label>
+                <select
+                  id="dayType"
+                  class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all duration-300"
+                >
+                  <option value="full">Full Day</option>
+                  <option value="half">Half Day</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
+                <i class="fas fa-sticky-note mr-2"></i>Description
+              </label>
+              <textarea
+                id="dayDescription"
+                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all duration-300"
+                rows="3"
+                placeholder="Optional description of the work day"
+              ></textarea>
+            </div>
+            <div>
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3"
+              >
+                <i class="fas fa-users mr-2"></i>Select Workers
+              </label>
+              <div
+                id="workerSelection"
+                class="space-y-3 max-h-48 overflow-y-auto scrollbar-hide bg-gray-50 dark:bg-gray-700 rounded-xl p-4"
+              ></div>
+            </div>
+            <div class="flex space-x-3 pt-4">
+              <button
+                type="submit"
+                class="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 rounded-xl transition-all duration-300 transform hover:scale-105 font-medium"
+              >
+                <i class="fas fa-plus mr-2"></i>Add Work Day
+              </button>
+              <button
+                type="button"
+                id="cancelDay"
+                class="flex-1 bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-200 py-3 rounded-xl transition-all duration-300 font-medium"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div
+      id="paymentModal"
+      class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4"
+    >
+      <div
+        class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full animate-scale-in border border-gray-200 dark:border-gray-700"
+      >
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h3
+              class="text-xl font-bold text-gray-900 dark:text-white flex items-center space-x-2"
+            >
+              <i class="fas fa-money-bill-wave text-green-500"></i>
+              <span>Make Payment</span>
+            </h3>
+            <button
+              id="closePaymentModal"
+              class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+            >
+              <i class="fas fa-times text-xl"></i>
+            </button>
+          </div>
+          <form id="paymentForm" class="space-y-6">
+            <div>
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
+                <i class="fas fa-user mr-2"></i>Worker
+              </label>
+              <select
+                id="paymentWorker"
+                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all duration-300"
+                required
+              ></select>
+            </div>
+            <div>
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
+                <i class="fas fa-coins mr-2"></i>Amount (Tomans)
+              </label>
+              <input
+                type="number"
+                id="paymentAmount"
+                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all duration-300"
+                placeholder="Enter payment amount"
+                required
+              />
+              <div
+                id="paymentSuggestion"
+                class="mt-2 text-sm text-blue-600 dark:text-blue-400"
+              ></div>
+            </div>
+            <div>
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
+                <i class="fas fa-sticky-note mr-2"></i>Description
+              </label>
+              <textarea
+                id="paymentDescription"
+                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all duration-300"
+                rows="2"
+                placeholder="Optional payment description"
+              ></textarea>
+            </div>
+            <div class="flex space-x-3 pt-4">
+              <button
+                type="submit"
+                class="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 rounded-xl transition-all duration-300 transform hover:scale-105 font-medium"
+              >
+                <i class="fas fa-check mr-2"></i>Make Payment
+              </button>
+              <button
+                type="button"
+                id="cancelPayment"
+                class="flex-1 bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-200 py-3 rounded-xl transition-all duration-300 font-medium"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payment History Modal -->
+    <div
+      id="paymentHistoryModal"
+      class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4"
+    >
+      <div
+        class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-4xl w-full animate-scale-in border border-gray-200 dark:border-gray-700 max-h-[90vh] overflow-hidden"
+      >
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h3
+              class="text-xl font-bold text-gray-900 dark:text-white flex items-center space-x-2"
+            >
+              <i class="fas fa-history text-blue-500"></i>
+              <span>Payment History</span>
+            </h3>
+            <button
+              id="closePaymentHistory"
+              class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+            >
+              <i class="fas fa-times text-xl"></i>
+            </button>
+          </div>
+          <div
+            id="paymentHistoryContent"
+            class="overflow-y-auto max-h-[70vh]"
+          ></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Revenue Modal -->
+    <div
+      id="revenueModal"
+      class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4"
+    >
+      <div
+        class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full animate-scale-in border border-gray-200 dark:border-gray-700"
+      >
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h3
+              class="text-xl font-bold text-gray-900 dark:text-white flex items-center space-x-2"
+            >
+              <i class="fas fa-chart-line text-orange-500"></i>
+              <span>Add Revenue</span>
+            </h3>
+            <button
+              id="closeRevenueModal"
+              class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+            >
+              <i class="fas fa-times text-xl"></i>
+            </button>
+          </div>
+          <form id="revenueForm" class="space-y-6">
+            <div>
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
+                <i class="fas fa-coins mr-2"></i>Amount (Tomans)
+              </label>
+              <input
+                type="number"
+                id="revenueAmount"
+                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all duration-300"
+                placeholder="Enter revenue amount"
+                required
+              />
+            </div>
+            <div>
+              <label
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
+                <i class="fas fa-sticky-note mr-2"></i>Description
+              </label>
+              <textarea
+                id="revenueDescription"
+                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all duration-300"
+                rows="2"
+                placeholder="Optional revenue description"
+              ></textarea>
+            </div>
+            <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4">
+              <h4
+                class="text-sm font-medium text-blue-900 dark:text-blue-100 mb-2"
+              >
+                Distribution Preview
+              </h4>
+              <div
+                id="distributionPreview"
+                class="text-sm text-blue-700 dark:text-blue-300"
+              ></div>
+            </div>
+            <div class="flex space-x-3 pt-4">
+              <button
+                type="submit"
+                class="flex-1 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white py-3 rounded-xl transition-all duration-300 transform hover:scale-105 font-medium"
+              >
+                <i class="fas fa-plus mr-2"></i>Add Revenue
+              </button>
+              <button
+                type="button"
+                id="cancelRevenue"
+                class="flex-1 bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-200 py-3 rounded-xl transition-all duration-300 font-medium"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div
+      id="notificationToast"
+      class="fixed top-4 right-4 z-50 transform translate-x-full transition-transform duration-300"
+    >
+      <div
+        class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-4 max-w-sm"
+      >
+        <div class="flex items-center space-x-3">
+          <div
+            id="toastIcon"
+            class="w-8 h-8 rounded-full flex items-center justify-center"
+          >
+            <i class="fas fa-check text-white"></i>
+          </div>
+          <div class="flex-1">
+            <p
+              id="toastTitle"
+              class="font-medium text-gray-900 dark:text-white"
+            ></p>
+            <p
+              id="toastMessage"
+              class="text-sm text-gray-600 dark:text-gray-400"
+            ></p>
+          </div>
+          <button
+            id="closeToast"
+            class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+          >
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+              class EnhancedWorkerManagementSystem {
+                  constructor() {
+                      this.workers = JSON.parse(localStorage.getItem('workers')) || [];
+                      this.workDays = JSON.parse(localStorage.getItem('workDays')) || [];
+                      this.payments = JSON.parse(localStorage.getItem('payments')) || [];
+                      this.revenues = JSON.parse(localStorage.getItem('revenues')) || [];
+                      this.currentPage = 1;
+                      this.daysPerPage = 7;
+                      this.currentTab = 'dashboard';
+                      this.init();
+                  }
+
+                  init() {
+                      this.setupEventListeners();
+                      this.setupTheme();
+                      this.updateClock();
+                      this.updateDashboardStats();
+                      this.renderDashboard();
+                      this.renderWorkers();
+                      this.renderSchedule();
+                      this.renderPayments();
+                      this.renderRevenue();
+                      this.renderAnalytics();
+                      this.updateScheduleSummary();
+                      this.checkNotifications();
+
+                      // Update clock every minute
+                      setInterval(() => this.updateClock(), 60000);
+
+                      // Auto-save every 30 seconds
+                      setInterval(() => this.saveData(), 30000);
+                  }
+
+                  setupEventListeners() {
+                      // Tab navigation
+                      document.querySelectorAll('.tab-btn').forEach(btn => {
+                          btn.addEventListener('click', (e) => {
+                              e.preventDefault();
+                              const tabName = e.target.closest('.tab-btn').dataset.tab;
+                              this.switchTab(tabName);
+                          });
+                      });
+
+                      // Theme toggle
+                      const themeToggle = document.getElementById('themeToggle');
+                      if (themeToggle) {
+                          themeToggle.addEventListener('click', (e) => {
+                              e.preventDefault();
+                              this.toggleTheme();
+                          });
+                      }
+
+                      // Quick actions
+                      const quickAddWorker = document.getElementById('quickAddWorker');
+                      if (quickAddWorker) {
+                          quickAddWorker.addEventListener('click', (e) => {
+                              e.preventDefault();
+                              this.showModal('workerModal');
+                          });
+                      }
+
+                      const quickAddDay = document.getElementById('quickAddDay');
+                      if (quickAddDay) {
+                          quickAddDay.addEventListener('click', (e) => {
+                              e.preventDefault();
+                              this.showAddDayModal();
+                          });
+                      }
+
+                      const quickPayment = document.getElementById('quickPayment');
+                      if (quickPayment) {
+                          quickPayment.addEventListener('click', (e) => {
+                              e.preventDefault();
+                              this.showQuickPaymentModal();
+                          });
+                      }
+
+                      const quickRevenue = document.getElementById('quickRevenue');
+                      if (quickRevenue) {
+                          quickRevenue.addEventListener('click', (e) => {
+                              e.preventDefault();
+                              this.showModal('revenueModal');
+                          });
+                      }
+
+                      // Worker management
+                      const addWorkerBtn = document.getElementById('addWorkerBtn');
+                      if (addWorkerBtn) {
+                          addWorkerBtn.addEventListener('click', (e) => {
+                              e.preventDefault();
+                              this.showModal('workerModal');
+                          });
+                      }
+
+                      const closeWorkerModal = document.getElementById('closeWorkerModal');
+                      if (closeWorkerModal) {
+                          closeWorkerModal.addEventListener('click', (e) => {
+                              e.preventDefault();
+                              this.hideModal('workerModal');
+                          });
+                      }
+
+                      const cancelWorker = document.getElementById('cancelWorker');
+                      if (cancelWorker) {
+                          cancelWorker.addEventListener('click', (e) => {
+                              e.preventDefault();
+                              this.hideModal('workerModal');
+                          });
+                      }
+
+                      const workerForm = document.getElementById('workerForm');
+                      if (workerForm) {
+                          workerForm.addEventListener('submit', (e) => this.addWorker(e));
+                      }
+
+                      const workerSearch = document.getElementById('workerSearch');
+                      if (workerSearch) {
+                          workerSearch.addEventListener('input', (e) => this.filterWorkers(e.target.value));
+                      }
+
+                      const workerFilter = document.getElementById('workerFilter');
+                      if (workerFilter) {
+                          workerFilter.addEventListener('change', (e) => this.filterWorkersByType(e.target.value));
+                      }
+
+                      // Day management
+                      const addDayBtn = document.getElementById('addDayBtn');
+                      if (addDayBtn) {
+                          addDayBtn.addEventListener('click', (e) => {
+                              e.preventDefault();
+                              this.showAddDayModal();
+                          });
+                      }
+
+                      const closeDayModal = document.getElementById('closeDayModal');
+                      if (closeDayModal) {
+                          closeDayModal.addEventListener('click', (e) => {
+                              e.preventDefault();
+                              this.hideModal('dayModal');
+                          });
+                      }
+
+                      const cancelDay = document.getElementById('cancelDay');
+                      if (cancelDay) {
+                          cancelDay.addEventListener('click', (e) => {
+                              e.preventDefault();
+                              this.hideModal('dayModal');
+                          });
+                      }
+
+                      const dayForm = document.getElementById('dayForm');
+                      if (dayForm) {
+                          dayForm.addEventListener('submit', (e) => this.addWorkDay(e));
+                      }
+
+                      // Payment management
+                      const closePaymentModal = document.getElementById('closePaymentModal');
+                      if (closePaymentModal) {
+                          closePaymentModal.addEventListener('click', (e) => {
+                              e.preventDefault();
+                              this.hideModal('paymentModal');
+                          });
+                      }
+
+                      const cancelPayment = document.getElementById('cancelPayment');
+                      if (cancelPayment) {
+                          cancelPayment.addEventListener('click', (e) => {
+                              e.preventDefault();
+                              this.hideModal('paymentModal');
+                          });
+                      }
+
+                      const paymentForm = document.getElementById('paymentForm');
+                      if (paymentForm) {
+                          paymentForm.addEventListener('submit', (e) => this.makePayment(e));
+                      }
+
+                      const closePaymentHistory = document.getElementById('closePaymentHistory');
+                      if (closePaymentHistory) {
+                          closePaymentHistory.addEventListener('click', (e) => {
+                              e.preventDefault();
+                              this.hideModal('paymentHistoryModal');
+                          });
+                      }
+
+                      const paymentWorker = document.getElementById('paymentWorker');
+                      if (paymentWorker) {
+                          paymentWorker.addEventListener('change', (e) => this.updatePaymentSuggestion(e.target.value));
+                      }
+
+                      // Revenue management
+                      const addRevenueBtn = document.getElementById('addRevenueBtn');
+                      if (addRevenueBtn) {
+                          addRevenueBtn.addEventListener('click', (e) => {
+                              e.preventDefault();
+                              this.showModal('revenueModal');
+                          });
+                      }
+
+                      const closeRevenueModal = document.getElementById('closeRevenueModal');
+                      if (closeRevenueModal) {
+                          closeRevenueModal.addEventListener('click', (e) => {
+                              e.preventDefault();
+                              this.hideModal('revenueModal');
+                          });
+                      }
+
+                      const cancelRevenue = document.getElementById('cancelRevenue');
+                      if (cancelRevenue) {
+                          cancelRevenue.addEventListener('click', (e) => {
+                              e.preventDefault();
+                              this.hideModal('revenueModal');
+                          });
+                      }
+
+                      const revenueForm = document.getElementById('revenueForm');
+                      if (revenueForm) {
+                          revenueForm.addEventListener('submit', (e) => this.addRevenue(e));
+                      }
+
+                      const revenueAmount = document.getElementById('revenueAmount');
+                      if (revenueAmount) {
+                          revenueAmount.addEventListener('input', (e) => this.updateDistributionPreview(e.target.value));
+                      }
+
+                      // Pagination
+                      const prevPage = document.getElementById('prevPage');
+                      if (prevPage) {
+                          prevPage.addEventListener('click', (e) => {
+                              e.preventDefault();
+                              this.changePage(-1);
+                          });
+                      }
+
+                      const nextPage = document.getElementById('nextPage');
+                      if (nextPage) {
+                          nextPage.addEventListener('click', (e) => {
+                              e.preventDefault();
+                              this.changePage(1);
+                          });
+                      }
+
+                      // Date filtering
+                      const filterDates = document.getElementById('filterDates');
+                      if (filterDates) {
+                          filterDates.addEventListener('click', (e) => {
+                              e.preventDefault();
+                              this.filterByDateRange();
+                          });
+                      }
+
+                      // Worker type change
+                      const workerType = document.getElementById('workerType');
+                      if (workerType) {
+                          workerType.addEventListener('change', () => this.updateAmountHint());
+                      }
+
+                      // Toast notification
+                      const closeToast = document.getElementById('closeToast');
+                      if (closeToast) {
+                          closeToast.addEventListener('click', (e) => {
+                              e.preventDefault();
+                              this.hideToast();
+                          });
+                      }
+
+                      // Analytics timeframe
+                      const analyticsTimeframe = document.getElementById('analyticsTimeframe');
+                      if (analyticsTimeframe) {
+                          analyticsTimeframe.addEventListener('change', (e) => this.updateAnalytics(e.target.value));
+                      }
+
+                      // Export functionality
+                      const exportWorkers = document.getElementById('exportWorkers');
+                      if (exportWorkers) {
+                          exportWorkers.addEventListener('click', (e) => {
+                              e.preventDefault();
+                              this.exportData('workers');
+                          });
+                      }
+
+                      const exportAnalytics = document.getElementById('exportAnalytics');
+                      if (exportAnalytics) {
+                          exportAnalytics.addEventListener('click', (e) => {
+                              e.preventDefault();
+                              this.exportData('analytics');
+                          });
+                      }
+
+                      const paymentReport = document.getElementById('paymentReport');
+                      if (paymentReport) {
+                          paymentReport.addEventListener('click', (e) => {
+                              e.preventDefault();
+                              this.exportData('payments');
+                          });
+                      }
+
+                      const bulkPayment = document.getElementById('bulkPayment');
+                      if (bulkPayment) {
+                          bulkPayment.addEventListener('click', (e) => {
+                              e.preventDefault();
+                              this.showBulkPayment();
+                          });
+                      }
+
+                      const calendarView = document.getElementById('calendarView');
+                      if (calendarView) {
+                          calendarView.addEventListener('click', (e) => {
+                              e.preventDefault();
+                              this.showCalendarView();
+                          });
+                      }
+
+                      // Notification button
+                      const notificationBtn = document.getElementById('notificationBtn');
+                      if (notificationBtn) {
+                          notificationBtn.addEventListener('click', (e) => {
+                              e.preventDefault();
+                              this.showNotifications();
+                          });
+                      }
+
+                      // Modal click outside to close
+                      document.addEventListener('click', (e) => {
+                          if (e.target.classList.contains('fixed') && e.target.classList.contains('inset-0')) {
+                              const modals = ['workerModal', 'dayModal', 'paymentModal', 'paymentHistoryModal', 'revenueModal'];
+                              modals.forEach(modalId => {
+                                  if (!document.getElementById(modalId).classList.contains('hidden')) {
+                                      this.hideModal(modalId);
+                                  }
+                              });
+                          }
+                      });
+                  }
+
+                  setupTheme() {
+                      const savedTheme = localStorage.getItem('theme') || 'light';
+                      if (savedTheme === 'dark') {
+                          document.documentElement.classList.add('dark');
+                      }
+                  }
+
+                  toggleTheme() {
+                      document.documentElement.classList.toggle('dark');
+                      const isDark = document.documentElement.classList.contains('dark');
+                      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                  }
+
+                  updateClock() {
+                      const now = new Date();
+                      const timeString = now.toLocaleTimeString('en-US', {
+                          hour12: false,
+                          hour: '2-digit',
+                          minute: '2-digit'
+                      });
+                      const clockElement = document.getElementById('currentTime');
+                      if (clockElement) {
+                          clockElement.textContent = timeString;
+                      }
+                  }
+
+                  showToast(title, message, type = 'success') {
+                      const toast = document.getElementById('notificationToast');
+                      const icon = document.getElementById('toastIcon');
+                      const titleEl = document.getElementById('toastTitle');
+                      const messageEl = document.getElementById('toastMessage');
+
+                      // Set content
+                      titleEl.textContent = title;
+                      messageEl.textContent = message;
+
+                      // Set icon and color based on type
+                      const iconClasses = {
+                          success: 'bg-green-500 fas fa-check',
+                          error: 'bg-red-500 fas fa-times',
+                          warning: 'bg-yellow-500 fas fa-exclamation',
+                          info: 'bg-blue-500 fas fa-info'
+                      };
+
+                      icon.className = `w-8 h-8 rounded-full flex items-center justify-center ${iconClasses[type]}`;
+                      icon.innerHTML = `<i class="${iconClasses[type].split(' ').slice(2).join(' ')} text-white"></i>`;
+
+                      // Show toast
+                      toast.classList.remove('translate-x-full');
+                      toast.classList.add('translate-x-0');
+
+                      // Auto hide after 5 seconds
+                      setTimeout(() => this.hideToast(), 5000);
+                  }
+
+                  hideToast() {
+                      const toast = document.getElementById('notificationToast');
+                      toast.classList.remove('translate-x-0');
+                      toast.classList.add('translate-x-full');
+                  }
+
+                  switchTab(tabName) {
+                      this.currentTab = tabName;
+
+                      // Update tab buttons
+                      document.querySelectorAll('.tab-btn').forEach(btn => {
+                          btn.classList.remove('active', 'bg-white', 'dark:bg-gray-700', 'text-blue-600', 'dark:text-blue-400', 'shadow-md');
+                          btn.classList.add('text-gray-600', 'dark:text-gray-400', 'hover:text-gray-900', 'dark:hover:text-white');
+                      });
+
+                      const activeBtn = document.querySelector(`[data-tab="${tabName}"]`);
+                      activeBtn.classList.add('active', 'bg-white', 'dark:bg-gray-700', 'text-blue-600', 'dark:text-blue-400', 'shadow-md');
+                      activeBtn.classList.remove('text-gray-600', 'dark:text-gray-400', 'hover:text-gray-900', 'dark:hover:text-white');
+
+                      // Show/hide tab content
+                      document.querySelectorAll('.tab-content').forEach(content => {
+                          content.classList.add('hidden');
+                      });
+                      document.getElementById(`${tabName}-tab`).classList.remove('hidden');
+
+                      // Update content based on tab
+                      if (tabName === 'analytics') {
+                          this.renderAnalytics();
+                      }
+                  }
+
+                  showModal(modalId) {
+                      document.getElementById(modalId).classList.remove('hidden');
+                      document.body.style.overflow = 'hidden';
+                  }
+
+                  hideModal(modalId) {
+                      document.getElementById(modalId).classList.add('hidden');
+                      document.body.style.overflow = 'auto';
+                      // Reset forms
+                      const form = document.querySelector(`#${modalId} form`);
+                      if (form) form.reset();
+                  }
+
+                  updateAmountHint() {
+                      const type = document.getElementById('workerType').value;
+                      const hint = document.getElementById('amountHint');
+                      hint.textContent = type === 'percentage'
+                          ? 'Enter percentage (e.g., 50 for 50%)'
+                          : 'Enter daily wage in Tomans (e.g., 500000)';
+                  }
+
+                  updateDistributionPreview(amount) {
+                      const preview = document.getElementById('distributionPreview');
+                      const percentageWorkers = this.workers.filter(w => w.type === 'percentage');
+
+                      if (!amount || percentageWorkers.length === 0) {
+                          preview.innerHTML = 'No percentage-based workers to distribute to.';
+                          return;
+                      }
+
+                      const distributions = percentageWorkers.map(worker => ({
+                          name: worker.name,
+                          percentage: worker.amount,
+                          amount: (parseFloat(amount) * worker.amount) / 100
+                      }));
+
+                      preview.innerHTML = distributions.map(dist =>
+                          `<div class="flex justify-between">
+                              <span>${dist.name} (${dist.percentage}%):</span>
+                              <span class="font-medium">${dist.amount.toLocaleString()} Tomans</span>
+                          </div>`
+                      ).join('');
+                  }
+
+                  updatePaymentSuggestion(workerId) {
+                      const worker = this.workers.find(w => w.id === parseInt(workerId));
+                      const suggestion = document.getElementById('paymentSuggestion');
+
+                      if (!worker) {
+                          suggestion.textContent = '';
+                          return;
+                      }
+
+                      const totalOwed = worker.totalEarned - worker.totalPaid;
+                      if (totalOwed > 0) {
+                          suggestion.innerHTML = `💡 مبلغ پیشنهادی: <strong>${totalOwed.toLocaleString()} تومان</strong> (کل بدهی)`;
+                      } else {
+                          suggestion.textContent = '✅ این کارگر بدهی ندارد';
+                      }
+                  }
+
+                  updateDashboardStats() {
+                      // Update dashboard statistics
+                      document.getElementById('totalWorkersCount').textContent = this.workers.length;
+                      document.getElementById('activeDaysCount').textContent = this.workDays.length;
+
+                      const totalEarnings = this.workers.reduce((sum, worker) => sum + worker.totalEarned, 0);
+                      document.getElementById('totalEarningsAmount').textContent = totalEarnings.toLocaleString();
+
+                      const pendingPayments = this.workers.reduce((sum, worker) => sum + Math.max(0, worker.totalEarned - worker.totalPaid), 0);
+                      document.getElementById('pendingPaymentsAmount').textContent = pendingPayments.toLocaleString();
+                  }
+
+                  renderDashboard() {
+                      this.renderRecentActivity();
+                      this.updateDashboardStats();
+                  }
+
+                  renderRecentActivity() {
+                      const container = document.getElementById('recentActivity');
+                      const activities = [];
+
+                      // Add recent work days
+                      this.workDays.slice(-5).forEach(day => {
+                          activities.push({
+                              type: 'work',
+                              date: new Date(day.date),
+                              description: `Work day added: ${day.workers.length} workers, ${day.dayType} day`,
+                              icon: 'fas fa-calendar-check',
+                              color: 'text-green-500'
+                          });
+                      });
+
+                      // Add recent payments
+                      this.payments.slice(-5).forEach(payment => {
+                          const worker = this.workers.find(w => w.id === payment.workerId);
+                          activities.push({
+                              type: 'payment',
+                              date: new Date(payment.date),
+                              description: `Payment made to ${worker?.name || 'Unknown'}: ${payment.amount.toLocaleString()} Tomans`,
+                              icon: 'fas fa-money-bill-wave',
+                              color: 'text-blue-500'
+                          });
+                      });
+
+                      // Add recent revenues
+                      this.revenues.slice(-3).forEach(revenue => {
+                          activities.push({
+                              type: 'revenue',
+                              date: new Date(revenue.date),
+                              description: `Revenue added: ${revenue.amount.toLocaleString()} Tomans`,
+                              icon: 'fas fa-chart-line',
+                              color: 'text-purple-500'
+                          });
+                      });
+
+                      // Sort by date (newest first)
+                      activities.sort((a, b) => b.date - a.date);
+
+                      if (activities.length === 0) {
+                          container.innerHTML = `
+                              <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+                                  <i class="fas fa-clock text-3xl mb-3 opacity-50"></i>
+                                  <p>No recent activity</p>
+                                  <p class="text-sm">Start by adding workers or work days</p>
+                              </div>
+                          `;
+                          return;
+                      }
+
+                      container.innerHTML = activities.slice(0, 10).map(activity => `
+                          <div class="flex items-center space-x-3 p-3 bg-white/30 dark:bg-gray-700/30 rounded-lg">
+                              <div class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-600 flex items-center justify-center">
+                                  <i class="${activity.icon} ${activity.color} text-sm"></i>
+                              </div>
+                              <div class="flex-1">
+                                  <p class="text-sm text-gray-900 dark:text-white">${activity.description}</p>
+                                  <p class="text-xs text-gray-500 dark:text-gray-400">${activity.date.toLocaleDateString()}</p>
+                              </div>
+                          </div>
+                      `).join('');
+                  }
+
+                  addWorker(e) {
+                      e.preventDefault();
+                      const name = document.getElementById('workerName').value.trim();
+                      const type = document.getElementById('workerType').value;
+                      const amount = parseFloat(document.getElementById('workerAmount').value);
+
+                      if (!name || !amount || amount <= 0) {
+                          this.showToast('خطا', 'لطفاً تمام فیلدها را با مقادیر معتبر پر کنید', 'error');
+                          return;
+                      }
+
+                      // Validate percentage range
+                      if (type === 'percentage' && (amount < 0 || amount > 100)) {
+                          this.showToast('خطا', 'درصد باید بین 0 تا 100 باشد', 'error');
+                          return;
+                      }
+
+                      // Check for duplicate names
+                      if (this.workers.some(w => w.name.toLowerCase() === name.toLowerCase())) {
+                          this.showToast('خطا', 'کارگری با این نام قبلاً وجود دارد', 'error');
+                          return;
+                      }
+
+                      const worker = {
+                          id: Date.now(),
+                          name,
+                          type,
+                          amount,
+                          totalEarned: 0,
+                          totalPaid: 0,
+                          daysWorked: 0,
+                          createdAt: new Date().toISOString()
+                      };
+
+                      this.workers.push(worker);
+                      this.saveData();
+                      this.renderWorkers();
+                      this.renderPayments();
+                      this.updateDashboardStats();
+                      this.renderDashboard();
+                      this.hideModal('workerModal');
+                      this.showToast('موفقیت', `کارگر "${name}" با موفقیت اضافه شد`, 'success');
+
+                      // Clear form
+                      document.getElementById('workerForm').reset();
+                  }
+
+                  deleteWorker(id) {
+                      const worker = this.workers.find(w => w.id === id);
+                      if (!worker) return;
+
+                      if (confirm(`آیا مطمئن هستید که می‌خواهید "${worker.name}" را حذف کنید؟ این کار تمام روزهای کاری و پرداخت‌های مرتبط را نیز حذف می‌کند.`)) {
+                          this.workers = this.workers.filter(w => w.id !== id);
+                          this.workDays = this.workDays.map(day => ({
+                              ...day,
+                              workers: day.workers.filter(w => w.id !== id)
+                          })).filter(day => day.workers.length > 0); // Remove empty work days
+                          this.payments = this.payments.filter(p => p.workerId !== id);
+                          this.saveData();
+                          this.renderWorkers();
+                          this.renderSchedule();
+                          this.renderPayments();
+                          this.updateScheduleSummary();
+                          this.updateDashboardStats();
+                          this.renderDashboard();
+                          this.showToast('موفقیت', `کارگر "${worker.name}" با موفقیت حذف شد`, 'success');
+                      }
+                  }
+
+                  filterWorkers(searchTerm) {
+                      const workers = document.querySelectorAll('#workersList .worker-card');
+                      workers.forEach(card => {
+                          const name = card.querySelector('.worker-name').textContent.toLowerCase();
+                          const visible = name.includes(searchTerm.toLowerCase());
+                          card.style.display = visible ? 'block' : 'none';
+                      });
+                  }
+
+                  filterWorkersByType(type) {
+                      const workers = document.querySelectorAll('#workersList .worker-card');
+                      workers.forEach(card => {
+                          const workerType = card.dataset.type;
+                          const workerData = this.workers.find(w => w.id === parseInt(card.dataset.id));
+                          let visible = true;
+
+                          switch(type) {
+                              case 'percentage':
+                                  visible = workerType === 'percentage';
+                                  break;
+                              case 'daily':
+                                  visible = workerType === 'daily';
+                                  break;
+                              case 'pending':
+                                  visible = workerData && (workerData.totalEarned - workerData.totalPaid) > 0;
+                                  break;
+                              default:
+                                  visible = true;
+                          }
+
+                          card.style.display = visible ? 'block' : 'none';
+                      });
+                  }
+
+                  renderWorkers() {
+                      const container = document.getElementById('workersList');
+                      if (this.workers.length === 0) {
+                          container.innerHTML = `
+                              <div class="col-span-full text-center py-12">
+                                  <div class="text-gray-400 dark:text-gray-500 mb-4">
+                                      <i class="fas fa-users text-6xl"></i>
+                                  </div>
+                                  <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No workers yet</h3>
+                                  <p class="text-gray-500 dark:text-gray-400 mb-6">Get started by adding your first team member</p>
+                                  <button onclick="wms.showModal('workerModal')" class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-6 py-3 rounded-xl transition-all duration-300 transform hover:scale-105">
+                                      <i class="fas fa-plus mr-2"></i>Add First Worker
+                                  </button>
+                              </div>
+                          `;
+                          return;
+                      }
+
+                      container.innerHTML = this.workers.map((worker, index) => {
+                          const totalOwed = worker.totalEarned - worker.totalPaid;
+                          const paymentStatus = totalOwed > 0 ? 'pending' : 'paid';
+
+                          return `
+                              <div class="worker-card bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-2xl p-6 card-hover animate-fade-in border border-gray-200/50 dark:border-gray-700/50"
+                                   data-id="${worker.id}" data-type="${worker.type}" style="animation-delay: ${index * 0.1}s;">
+                                  <div class="flex items-start justify-between mb-4">
+                                      <div class="flex items-center space-x-3">
+                                          <div class="w-12 h-12 bg-gradient-to-r ${worker.type === 'percentage' ? 'from-purple-500 to-pink-500' : 'from-blue-500 to-cyan-500'} rounded-xl flex items-center justify-center">
+                                              <i class="fas ${worker.type === 'percentage' ? 'fa-percentage' : 'fa-calendar-day'} text-white"></i>
+                                          </div>
+                                          <div>
+                                              <h3 class="worker-name font-bold text-gray-900 dark:text-white text-lg">${worker.name}</h3>
+                                              <p class="text-sm text-gray-600 dark:text-gray-400">
+                                                  ${worker.type === 'percentage' ? `${worker.amount}% Revenue Share` : `${worker.amount.toLocaleString()} Tomans/day`}
+                                              </p>
+                                          </div>
+                                      </div>
+                                      <div class="flex items-center space-x-2">
+                                          <span class="px-2 py-1 rounded-full text-xs font-medium ${paymentStatus === 'pending' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200' : 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200'}">
+                                              ${paymentStatus === 'pending' ? 'Payment Due' : 'Up to Date'}
+                                          </span>
+                                      </div>
+                                  </div>
+
+                                  <div class="grid grid-cols-2 gap-3 mb-4">
+                                      <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3">
+                                          <div class="flex items-center space-x-2">
+                                              <i class="fas fa-calendar-check text-blue-500"></i>
+                                              <span class="text-xs text-blue-700 dark:text-blue-300">Days Worked</span>
+                                          </div>
+                                          <p class="text-lg font-bold text-blue-600 dark:text-blue-400">${worker.daysWorked}</p>
+                                      </div>
+                                      <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-3">
+                                          <div class="flex items-center space-x-2">
+                                              <i class="fas fa-coins text-green-500"></i>
+                                              <span class="text-xs text-green-700 dark:text-green-300">Total Earned</span>
+                                          </div>
+                                          <p class="text-lg font-bold text-green-600 dark:text-green-400">${worker.totalEarned.toLocaleString()}</p>
+                                      </div>
+                                      <div class="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-3">
+                                          <div class="flex items-center space-x-2">
+                                              <i class="fas fa-money-bill-wave text-yellow-500"></i>
+                                              <span class="text-xs text-yellow-700 dark:text-yellow-300">Total Paid</span>
+                                          </div>
+                                          <p class="text-lg font-bold text-yellow-600 dark:text-yellow-400">${worker.totalPaid.toLocaleString()}</p>
+                                      </div>
+                                      <div class="bg-red-50 dark:bg-red-900/20 rounded-lg p-3">
+                                          <div class="flex items-center space-x-2">
+                                              <i class="fas fa-exclamation-triangle text-red-500"></i>
+                                              <span class="text-xs text-red-700 dark:text-red-300">Amount Owed</span>
+                                          </div>
+                                          <p class="text-lg font-bold text-red-600 dark:text-red-400">${totalOwed.toLocaleString()}</p>
+                                      </div>
+                                  </div>
+
+                                  <div class="flex space-x-2">
+                                      <button onclick="wms.showPaymentModal(${worker.id})" class="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-2 px-3 rounded-lg text-sm font-medium transition-all duration-300 transform hover:scale-105">
+                                          <i class="fas fa-money-bill-wave mr-1"></i>Pay
+                                      </button>
+                                      <button onclick="wms.showPaymentHistory(${worker.id})" class="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-2 px-3 rounded-lg text-sm font-medium transition-all duration-300 transform hover:scale-105">
+                                          <i class="fas fa-history mr-1"></i>History
+                                      </button>
+                                      <button onclick="wms.deleteWorker(${worker.id})" class="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white py-2 px-3 rounded-lg text-sm font-medium transition-all duration-300 transform hover:scale-105">
+                                          <i class="fas fa-trash"></i>
+                                      </button>
+                                  </div>
+                              </div>
+                          `;
+                      }).join('');
+                  }
+
+                  showAddDayModal() {
+                      if (this.workers.length === 0) {
+                          this.showToast('خطا', 'ابتدا کارگران را اضافه کنید', 'error');
+                          return;
+                      }
+
+                      // Set today's date as default
+                      document.getElementById('workDate').value = new Date().toISOString().split('T')[0];
+
+                      // Populate worker selection
+                      const container = document.getElementById('workerSelection');
+                      container.innerHTML = this.workers.map(worker => `
+                          <label class="flex items-center space-x-3 p-3 bg-white/50 dark:bg-gray-700/50 rounded-xl hover:bg-white/70 dark:hover:bg-gray-600/50 transition-all duration-300 cursor-pointer">
+                              <input type="checkbox" value="${worker.id}" class="worker-checkbox w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                              <div class="flex items-center space-x-3 flex-1">
+                                  <div class="w-8 h-8 bg-gradient-to-r ${worker.type === 'percentage' ? 'from-purple-500 to-pink-500' : 'from-blue-500 to-cyan-500'} rounded-lg flex items-center justify-center">
+                                      <i class="fas ${worker.type === 'percentage' ? 'fa-percentage' : 'fa-calendar-day'} text-white text-xs"></i>
+                                  </div>
+                                  <div>
+                                      <span class="font-medium text-gray-900 dark:text-white">${worker.name}</span>
+                                      <p class="text-xs text-gray-500 dark:text-gray-400">
+                                          ${worker.type === 'percentage' ? worker.amount + '% Revenue' : worker.amount.toLocaleString() + ' Tomans/day'}
+                                      </p>
+                                  </div>
+                              </div>
+                          </label>
+                      `).join('');
+
+                      this.showModal('dayModal');
+                  }
+
+                  addWorkDay(e) {
+                      e.preventDefault();
+                      const date = document.getElementById('workDate').value;
+                      const dayType = document.getElementById('dayType').value;
+                      const description = document.getElementById('dayDescription').value.trim();
+                      const selectedWorkers = Array.from(document.querySelectorAll('.worker-checkbox:checked'))
+                          .map(cb => parseInt(cb.value));
+
+                      if (!date) {
+                          this.showToast('خطا', 'لطفاً تاریخ را انتخاب کنید', 'error');
+                          return;
+                      }
+
+                      if (selectedWorkers.length === 0) {
+                          this.showToast('خطا', 'لطفاً حداقل یک کارگر انتخاب کنید', 'error');
+                          return;
+                      }
+
+                      // Check if date already exists
+                      const existingDay = this.workDays.find(day => day.date === date);
+                      if (existingDay) {
+                          this.showToast('خطا', 'روز کاری برای این تاریخ قبلاً وجود دارد', 'error');
+                          return;
+                      }
+
+                      const workDay = {
+                          id: Date.now(),
+                          date,
+                          dayType,
+                          description,
+                          workers: selectedWorkers.map(workerId => {
+                              const worker = this.workers.find(w => w.id === workerId);
+                              return {
+                                  id: workerId,
+                                  name: worker.name,
+                                  type: worker.type,
+                                  amount: worker.amount
+                              };
+                          }),
+                          createdAt: new Date().toISOString()
+                      };
+
+                      this.workDays.push(workDay);
+                      this.updateWorkerStats();
+                      this.saveData();
+                      this.renderSchedule();
+                      this.renderWorkers();
+                      this.renderPayments();
+                      this.updateScheduleSummary();
+                      this.updateDashboardStats();
+                      this.renderDashboard();
+                      this.hideModal('dayModal');
+                      this.showToast('موفقیت', `روز کاری برای ${new Date(date).toLocaleDateString('fa-IR')} با ${selectedWorkers.length} کارگر اضافه شد`, 'success');
+
+                      // Clear form
+                      document.getElementById('dayForm').reset();
+                  }
+
+                  updateWorkerStats() {
+                      // Reset stats
+                      this.workers.forEach(worker => {
+                          worker.daysWorked = 0;
+                          worker.totalEarned = 0;
+                          worker.totalPaid = 0;
+                      });
+
+                      // Calculate stats from work days for daily workers
+                      this.workDays.forEach(day => {
+                          day.workers.forEach(dayWorker => {
+                              const worker = this.workers.find(w => w.id === dayWorker.id);
+                              if (worker) {
+                                  const dayMultiplier = day.dayType === 'half' ? 0.5 : 1;
+
+                                  if (worker.type === 'daily') {
+                                      worker.daysWorked += dayMultiplier;
+                                      worker.totalEarned += dayWorker.amount * dayMultiplier;
+                                  } else if (worker.type === 'percentage') {
+                                      worker.daysWorked += dayMultiplier;
+                                  }
+                              }
+                          });
+                      });
+
+                      // Calculate percentage earnings from revenues
+                      this.revenues.forEach(revenue => {
+                          this.workers.forEach(worker => {
+                              if (worker.type === 'percentage') {
+                                  worker.totalEarned += (revenue.amount * worker.amount) / 100;
+                              }
+                          });
+                      });
+
+                      // Calculate total paid
+                      this.workers.forEach(worker => {
+                          worker.totalPaid = this.payments
+                              .filter(p => p.workerId === worker.id)
+                              .reduce((sum, p) => sum + p.amount, 0);
+                      });
+                  }
+
+                  renderSchedule() {
+                      const sortedDays = [...this.workDays].sort((a, b) => new Date(b.date) - new Date(a.date));
+                      const totalPages = Math.ceil(sortedDays.length / this.daysPerPage);
+                      const startIndex = (this.currentPage - 1) * this.daysPerPage;
+                      const endIndex = startIndex + this.daysPerPage;
+                      const currentDays = sortedDays.slice(startIndex, endIndex);
+
+                      document.getElementById('currentPage').textContent = this.currentPage;
+                      document.getElementById('totalPages').textContent = Math.max(totalPages, 1);
+                      document.getElementById('totalRecords').textContent = sortedDays.length;
+
+                      document.getElementById('prevPage').disabled = this.currentPage === 1;
+                      document.getElementById('nextPage').disabled = this.currentPage >= totalPages;
+
+                      const container = document.getElementById('scheduleTable');
+                      if (currentDays.length === 0) {
+                          container.innerHTML = `
+                              <div class="text-center py-12">
+                                  <div class="text-gray-400 dark:text-gray-500 mb-4">
+                                      <i class="fas fa-calendar-alt text-6xl"></i>
+                                  </div>
+                                  <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No work days recorded</h3>
+                                  <p class="text-gray-500 dark:text-gray-400 mb-6">Start tracking your team's work schedule</p>
+                                  <button onclick="wms.showAddDayModal()" class="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 py-3 rounded-xl transition-all duration-300 transform hover:scale-105">
+                                      <i class="fas fa-plus mr-2"></i>Add First Work Day
+                                  </button>
+                              </div>
+                          `;
+                          return;
+                      }
+
+                      container.innerHTML = `
+                          <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-xl overflow-hidden border border-gray-200/50 dark:border-gray-700/50">
+                              <table class="w-full">
+                                  <thead class="bg-gradient-to-r from-blue-500/10 to-purple-500/10 dark:from-blue-600/20 dark:to-purple-600/20">
+                                      <tr>
+                                          <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Date</th>
+                                          <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Type</th>
+                                          <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Description</th>
+                                          <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Workers</th>
+                                          <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
+                                      </tr>
+                                  </thead>
+                                  <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                                      ${currentDays.map((day, index) => `
+                                          <tr class="hover:bg-white/50 dark:hover:bg-gray-700/50 transition-all duration-300 animate-fade-in" style="animation-delay: ${index * 0.05}s;">
+                                              <td class="px-6 py-4 whitespace-nowrap">
+                                                  <div class="flex items-center space-x-2">
+                                                      <i class="fas fa-calendar text-blue-500"></i>
+                                                      <span class="text-sm font-medium text-gray-900 dark:text-white">${new Date(day.date).toLocaleDateString()}</span>
+                                                  </div>
+                                              </td>
+                                              <td class="px-6 py-4 whitespace-nowrap">
+                                                  <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${day.dayType === 'full' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200'}">
+                                                      <i class="fas ${day.dayType === 'full' ? 'fa-sun' : 'fa-adjust'} mr-1"></i>
+                                                      ${day.dayType === 'full' ? 'Full Day' : 'Half Day'}
+                                                  </span>
+                                              </td>
+                                              <td class="px-6 py-4">
+                                                  <span class="text-sm text-gray-900 dark:text-white">${day.description || '-'}</span>
+                                              </td>
+                                              <td class="px-6 py-4">
+                                                  <div class="flex flex-wrap gap-1">
+                                                      ${day.workers.map(worker => `
+                                                          <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200">
+                                                              <i class="fas ${worker.type === 'percentage' ? 'fa-percentage' : 'fa-calendar-day'} mr-1"></i>
+                                                              ${worker.name}
+                                                          </span>
+                                                      `).join('')}
+                                                  </div>
+                                              </td>
+                                              <td class="px-6 py-4 whitespace-nowrap">
+                                                  <button onclick="wms.deleteWorkDay(${day.id})" class="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-3 py-1 rounded-lg text-xs font-medium transition-all duration-300 transform hover:scale-105">
+                                                      <i class="fas fa-trash mr-1"></i>Delete
+                                                  </button>
+                                              </td>
+                                          </tr>
+                                      `).join('')}
+                                  </tbody>
+                              </table>
+                          </div>
+                      `;
+                  }
+
+                  changePage(direction) {
+                      const totalPages = Math.ceil(this.workDays.length / this.daysPerPage);
+                      const newPage = this.currentPage + direction;
+
+                      if (newPage >= 1 && newPage <= totalPages) {
+                          this.currentPage = newPage;
+                          this.renderSchedule();
+                      }
+                  }
+
+                  deleteWorkDay(id) {
+                      const day = this.workDays.find(d => d.id === id);
+                      if (!day) return;
+
+                      if (confirm(`آیا مطمئن هستید که می‌خواهید روز کاری ${new Date(day.date).toLocaleDateString('fa-IR')} را حذف کنید؟`)) {
+                          this.workDays = this.workDays.filter(d => d.id !== id);
+                          this.updateWorkerStats();
+                          this.saveData();
+                          this.renderSchedule();
+                          this.renderPayments();
+                          this.updateScheduleSummary();
+                          this.updateDashboardStats();
+                          this.renderDashboard();
+
+                          // Adjust current page if necessary
+                          const totalPages = Math.ceil(this.workDays.length / this.daysPerPage);
+                          if (this.currentPage > totalPages && totalPages > 0) {
+                              this.currentPage = totalPages;
+                          }
+                          this.renderSchedule();
+                          this.showToast('موفقیت', 'روز کاری با موفقیت حذف شد', 'success');
+                      }
+                  }
+
+                  updateScheduleSummary() {
+                      let totalDays = 0;
+                      let totalWages = 0;
+                      const activeWorkerIds = new Set();
+
+                      this.workDays.forEach(day => {
+                          const dayMultiplier = day.dayType === 'half' ? 0.5 : 1;
+
+                          day.workers.forEach(worker => {
+                              activeWorkerIds.add(worker.id);
+                              if (worker.type === 'daily') {
+                                  totalDays += dayMultiplier;
+                                  totalWages += worker.amount * dayMultiplier;
+                              }
+                          });
+                      });
+
+                      document.getElementById('totalDays').textContent = totalDays;
+                      document.getElementById('totalWages').textContent = totalWages.toLocaleString();
+                      document.getElementById('activeWorkers').textContent = activeWorkerIds.size;
+                  }
+
+                  showPaymentModal(workerId) {
+                      const worker = this.workers.find(w => w.id === workerId);
+                      if (!worker) return;
+
+                      const select = document.getElementById('paymentWorker');
+                      select.innerHTML = `<option value="${worker.id}">${worker.name}</option>`;
+                      select.value = worker.id;
+
+                      this.updatePaymentSuggestion(worker.id);
+                      this.showModal('paymentModal');
+                  }
+
+                  showQuickPaymentModal() {
+                      if (this.workers.length === 0) {
+                          this.showToast('خطا', 'ابتدا کارگران را اضافه کنید', 'error');
+                          return;
+                      }
+
+                      const select = document.getElementById('paymentWorker');
+                      select.innerHTML = this.workers.map(worker =>
+                          `<option value="${worker.id}">${worker.name} - ${(worker.totalEarned - worker.totalPaid).toLocaleString()} تومان بدهی</option>`
+                      ).join('');
+
+                      this.showModal('paymentModal');
+                  }
+
+                  makePayment(e) {
+                      e.preventDefault();
+                      const workerId = parseInt(document.getElementById('paymentWorker').value);
+                      const amount = parseFloat(document.getElementById('paymentAmount').value);
+                      const description = document.getElementById('paymentDescription').value.trim();
+
+                      if (!workerId || !amount || amount <= 0) {
+                          this.showToast('خطا', 'لطفاً تمام فیلدهای ضروری را با مقادیر معتبر پر کنید', 'error');
+                          return;
+                      }
+
+                      const worker = this.workers.find(w => w.id === workerId);
+                      if (!worker) {
+                          this.showToast('خطا', 'کارگر یافت نشد', 'error');
+                          return;
+                      }
+
+                      const payment = {
+                          id: Date.now(),
+                          workerId,
+                          amount,
+                          description,
+                          date: new Date().toISOString()
+                      };
+
+                      this.payments.push(payment);
+                      this.updateWorkerStats();
+                      this.saveData();
+                      this.renderWorkers();
+                      this.renderPayments();
+                      this.updateDashboardStats();
+                      this.renderDashboard();
+                      this.hideModal('paymentModal');
+                      this.showToast('موفقیت', `پرداخت ${amount.toLocaleString()} تومان به ${worker.name} انجام شد`, 'success');
+
+                      // Clear form
+                      document.getElementById('paymentForm').reset();
+                      document.getElementById('paymentSuggestion').innerHTML = '';
+                  }
+
+                  showPaymentHistory(workerId) {
+                      const worker = this.workers.find(w => w.id === workerId);
+                      const workerPayments = this.payments.filter(p => p.workerId === workerId)
+                          .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+                      const content = document.getElementById('paymentHistoryContent');
+                      content.innerHTML = `
+                          <div class="mb-6">
+                              <div class="flex items-center space-x-4 mb-4">
+                                  <div class="w-16 h-16 bg-gradient-to-r ${worker.type === 'percentage' ? 'from-purple-500 to-pink-500' : 'from-blue-500 to-cyan-500'} rounded-2xl flex items-center justify-center">
+                                      <i class="fas ${worker.type === 'percentage' ? 'fa-percentage' : 'fa-calendar-day'} text-white text-xl"></i>
+                                  </div>
+                                  <div>
+                                      <h4 class="text-2xl font-bold text-gray-900 dark:text-white">${worker.name}</h4>
+                                      <p class="text-gray-600 dark:text-gray-400">
+                                          ${worker.type === 'percentage' ? `${worker.amount}% Revenue Share` : `${worker.amount.toLocaleString()} Tomans/day`}
+                                      </p>
+                                  </div>
+                              </div>
+
+                              <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                                  <div class="stat-card rounded-xl p-4">
+                                      <div class="flex items-center space-x-2 mb-2">
+                                          <i class="fas fa-calendar-check text-blue-500"></i>
+                                          <span class="text-sm text-gray-600 dark:text-gray-400">Days Worked</span>
+                                      </div>
+                                      <p class="text-2xl font-bold text-blue-600 dark:text-blue-400">${worker.daysWorked}</p>
+                                  </div>
+                                  <div class="stat-card rounded-xl p-4">
+                                      <div class="flex items-center space-x-2 mb-2">
+                                          <i class="fas fa-coins text-green-500"></i>
+                                          <span class="text-sm text-gray-600 dark:text-gray-400">Total Earned</span>
+                                      </div>
+                                      <p class="text-2xl font-bold text-green-600 dark:text-green-400">${worker.totalEarned.toLocaleString()}</p>
+                                  </div>
+                                  <div class="stat-card rounded-xl p-4">
+                                      <div class="flex items-center space-x-2 mb-2">
+                                          <i class="fas fa-money-bill-wave text-yellow-500"></i>
+                                          <span class="text-sm text-gray-600 dark:text-gray-400">Total Paid</span>
+                                      </div>
+                                      <p class="text-2xl font-bold text-yellow-600 dark:text-yellow-400">${worker.totalPaid.toLocaleString()}</p>
+                                  </div>
+                                  <div class="stat-card rounded-xl p-4">
+                                      <div class="flex items-center space-x-2 mb-2">
+                                          <i class="fas fa-exclamation-triangle text-red-500"></i>
+                                          <span class="text-sm text-gray-600 dark:text-gray-400">Amount Owed</span>
+                                      </div>
+                                      <p class="text-2xl font-bold text-red-600 dark:text-red-400">${(worker.totalEarned - worker.totalPaid).toLocaleString()}</p>
+                                  </div>
+                              </div>
+                          </div>
+
+                          <div class="bg-white/50 dark:bg-gray-700/50 rounded-xl p-6">
+                              <h5 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center space-x-2">
+                                  <i class="fas fa-history text-blue-500"></i>
+                                  <span>Payment History</span>
+                              </h5>
+                              ${workerPayments.length === 0 ?
+                                  `<div class="text-center py-8 text-gray-500 dark:text-gray-400">
+                                      <i class="fas fa-receipt text-4xl mb-3 opacity-50"></i>
+                                      <p>No payments recorded yet</p>
+                                  </div>` :
+                                  `<div class="space-y-3 max-h-64 overflow-y-auto scrollbar-hide">
+                                      ${workerPayments.map(payment => `
+                                          <div class="flex items-center justify-between p-3 bg-white/50 dark:bg-gray-600/50 rounded-lg">
+                                              <div class="flex items-center space-x-3">
+                                                  <div class="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center">
+                                                      <i class="fas fa-money-bill-wave text-white"></i>
+                                                  </div>
+                                                  <div>
+                                                      <p class="font-medium text-gray-900 dark:text-white">${payment.amount.toLocaleString()} Tomans</p>
+                                                      <p class="text-sm text-gray-600 dark:text-gray-400">${new Date(payment.date).toLocaleDateString()}</p>
+                                                      ${payment.description ? `<p class="text-xs text-gray-500 dark:text-gray-400">${payment.description}</p>` : ''}
+                                                  </div>
+                                              </div>
+                                              <span class="text-xs text-green-600 dark:text-green-400 font-medium">PAID</span>
+                                          </div>
+                                      `).join('')}
+                                  </div>`
+                              }
+                          </div>
+                      `;
+
+                      this.showModal('paymentHistoryModal');
+                  }
+
+                  renderPayments() {
+                      const container = document.getElementById('paymentsList');
+                      if (this.workers.length === 0) {
+                          container.innerHTML = `
+                              <div class="text-center py-12">
+                                  <div class="text-gray-400 dark:text-gray-500 mb-4">
+                                      <i class="fas fa-credit-card text-6xl"></i>
+                                  </div>
+                                  <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No workers available</h3>
+                                  <p class="text-gray-500 dark:text-gray-400">Add workers first to manage payments</p>
+                              </div>
+                          `;
+                          return;
+                      }
+
+                      container.innerHTML = this.workers.map((worker, index) => {
+                          const totalOwed = worker.totalEarned - worker.totalPaid;
+                          const paymentStatus = totalOwed > 0 ? 'pending' : 'paid';
+                          const recentPayments = this.payments
+                              .filter(p => p.workerId === worker.id)
+                              .sort((a, b) => new Date(b.date) - new Date(a.date))
+                              .slice(0, 3);
+
+                          return `
+                              <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-2xl p-6 card-hover animate-fade-in border border-gray-200/50 dark:border-gray-700/50" style="animation-delay: ${index * 0.1}s;">
+                                  <div class="flex items-center justify-between mb-6">
+                                      <div class="flex items-center space-x-4">
+                                          <div class="w-14 h-14 bg-gradient-to-r ${worker.type === 'percentage' ? 'from-purple-500 to-pink-500' : 'from-blue-500 to-cyan-500'} rounded-2xl flex items-center justify-center">
+                                              <i class="fas ${worker.type === 'percentage' ? 'fa-percentage' : 'fa-calendar-day'} text-white text-lg"></i>
+                                          </div>
+                                          <div>
+                                              <h3 class="text-xl font-bold text-gray-900 dark:text-white">${worker.name}</h3>
+                                              <p class="text-sm text-gray-600 dark:text-gray-400">
+                                                  ${worker.type === 'percentage' ? `${worker.amount}% Revenue Share` : `${worker.amount.toLocaleString()} Tomans/day`}
+                                              </p>
+                                          </div>
+                                      </div>
+                                      <div class="flex items-center space-x-3">
+                                          <span class="px-3 py-1 rounded-full text-sm font-medium ${paymentStatus === 'pending' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200' : 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200'}">
+                                              ${paymentStatus === 'pending' ? 'Payment Due' : 'Up to Date'}
+                                          </span>
+                                          <button onclick="wms.showPaymentModal(${worker.id})" class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-4 py-2 rounded-xl transition-all duration-300 transform hover:scale-105">
+                                              <i class="fas fa-money-bill-wave mr-2"></i>Pay Now
+                                          </button>
+                                      </div>
+                                  </div>
+
+                                  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                                      <div class="bg-green-50 dark:bg-green-900/20 rounded-xl p-4">
+                                          <div class="flex items-center space-x-2 mb-2">
+                                              <i class="fas fa-coins text-green-500"></i>
+                                              <span class="text-xs text-green-700 dark:text-green-300">Earned</span>
+                                          </div>
+                                          <p class="text-lg font-bold text-green-600 dark:text-green-400">${worker.totalEarned.toLocaleString()}</p>
+                                      </div>
+                                      <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4">
+                                          <div class="flex items-center space-x-2 mb-2">
+                                              <i class="fas fa-money-bill-wave text-blue-500"></i>
+                                              <span class="text-xs text-blue-700 dark:text-blue-300">Paid</span>
+                                          </div>
+                                          <p class="text-lg font-bold text-blue-600 dark:text-blue-400">${worker.totalPaid.toLocaleString()}</p>
+                                      </div>
+                                      <div class="bg-${totalOwed > 0 ? 'red' : 'gray'}-50 dark:bg-${totalOwed > 0 ? 'red' : 'gray'}-900/20 rounded-xl p-4">
+                                          <div class="flex items-center space-x-2 mb-2">
+                                              <i class="fas fa-exclamation-triangle text-${totalOwed > 0 ? 'red' : 'gray'}-500"></i>
+                                              <span class="text-xs text-${totalOwed > 0 ? 'red' : 'gray'}-700 dark:text-${totalOwed > 0 ? 'red' : 'gray'}-300">Owed</span>
+                                          </div>
+                                          <p class="text-lg font-bold text-${totalOwed > 0 ? 'red' : 'gray'}-600 dark:text-${totalOwed > 0 ? 'red' : 'gray'}-400">${totalOwed.toLocaleString()}</p>
+                                      </div>
+                                      <div class="flex items-center justify-center">
+                                          <button onclick="wms.showPaymentHistory(${worker.id})" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 transform hover:scale-105">
+                                              <i class="fas fa-history mr-2"></i>History
+                                          </button>
+                                      </div>
+                                  </div>
+
+                                  ${recentPayments.length > 0 ? `
+                                      <div class="bg-white/50 dark:bg-gray-700/50 rounded-xl p-4">
+                                          <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 flex items-center space-x-2">
+                                              <i class="fas fa-clock text-gray-500"></i>
+                                              <span>Recent Payments</span>
+                                          </h4>
+                                          <div class="space-y-2">
+                                              ${recentPayments.map(payment => `
+                                                  <div class="flex items-center justify-between text-sm">
+                                                      <span class="text-gray-600 dark:text-gray-400">${new Date(payment.date).toLocaleDateString()}</span>
+                                                      <span class="font-medium text-green-600 dark:text-green-400">${payment.amount.toLocaleString()} Tomans</span>
+                                                  </div>
+                                              `).join('')}
+                                          </div>
+                                      </div>
+                                  ` : ''}
+                              </div>
+                          `;
+                      }).join('');
+                  }
+
+                  addRevenue(e) {
+                      e.preventDefault();
+                      const amount = parseFloat(document.getElementById('revenueAmount').value);
+                      const description = document.getElementById('revenueDescription').value.trim();
+
+                      if (!amount || amount <= 0) {
+                          this.showToast('خطا', 'لطفاً مبلغ درآمد معتبر وارد کنید', 'error');
+                          return;
+                      }
+
+                      const revenue = {
+                          id: Date.now(),
+                          amount,
+                          description,
+                          date: new Date().toISOString()
+                      };
+
+                      this.revenues.push(revenue);
+                      this.updateWorkerStats();
+                      this.saveData();
+                      this.renderRevenue();
+                      this.renderWorkers();
+                      this.renderPayments();
+                      this.updateDashboardStats();
+                      this.renderDashboard();
+                      this.hideModal('revenueModal');
+                      this.showToast('موفقیت', `درآمد ${amount.toLocaleString()} تومان با موفقیت اضافه شد`, 'success');
+
+                      // Clear form
+                      document.getElementById('revenueForm').reset();
+                      document.getElementById('distributionPreview').innerHTML = '';
+                  }
+
+                  renderRevenue() {
+                      const container = document.getElementById('revenueList');
+                      const percentageWorkers = this.workers.filter(w => w.type === 'percentage');
+
+                      if (this.revenues.length === 0) {
+                          container.innerHTML = `
+                              <div class="text-center py-12">
+                                  <div class="text-gray-400 dark:text-gray-500 mb-4">
+                                      <i class="fas fa-chart-pie text-6xl"></i>
+                                  </div>
+                                  <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No revenue recorded</h3>
+                                  <p class="text-gray-500 dark:text-gray-400 mb-6">Start tracking your business income</p>
+                                  <button onclick="wms.showModal('revenueModal')" class="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-6 py-3 rounded-xl transition-all duration-300 transform hover:scale-105">
+                                      <i class="fas fa-plus mr-2"></i>Add First Revenue
+                                  </button>
+                              </div>
+                          `;
+                          return;
+                      }
+
+                      const sortedRevenues = [...this.revenues].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+                      container.innerHTML = sortedRevenues.map((revenue, index) => {
+                          const distributions = percentageWorkers.map(worker => ({
+                              name: worker.name,
+                              percentage: worker.amount,
+                              amount: (revenue.amount * worker.amount) / 100
+                          }));
+
+                          return `
+                              <div class="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-2xl p-6 card-hover animate-fade-in border border-gray-200/50 dark:border-gray-700/50" style="animation-delay: ${index * 0.1}s;">
+                                  <div class="flex items-center justify-between mb-6">
+                                      <div class="flex items-center space-x-4">
+                                          <div class="w-14 h-14 bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl flex items-center justify-center">
+                                              <i class="fas fa-chart-line text-white text-lg"></i>
+                                          </div>
+                                          <div>
+                                              <h3 class="text-xl font-bold text-gray-900 dark:text-white">${revenue.amount.toLocaleString()} Tomans</h3>
+                                              <p class="text-sm text-gray-600 dark:text-gray-400">${new Date(revenue.date).toLocaleDateString()}</p>
+                                              ${revenue.description ? `<p class="text-xs text-gray-500 dark:text-gray-400">${revenue.description}</p>` : ''}
+                                          </div>
+                                      </div>
+                                      <button onclick="wms.deleteRevenue(${revenue.id})" class="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-4 py-2 rounded-xl transition-all duration-300 transform hover:scale-105">
+                                          <i class="fas fa-trash mr-2"></i>Delete
+                                      </button>
+                                  </div>
+
+                                  ${distributions.length > 0 ? `
+                                      <div class="bg-white/50 dark:bg-gray-700/50 rounded-xl p-4">
+                                          <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 flex items-center space-x-2">
+                                              <i class="fas fa-users text-orange-500"></i>
+                                              <span>Distribution to Workers</span>
+                                          </h4>
+                                          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                              ${distributions.map(dist => `
+                                                  <div class="flex items-center justify-between p-3 bg-white/50 dark:bg-gray-600/50 rounded-lg">
+                                                      <div class="flex items-center space-x-2">
+                                                          <div class="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center">
+                                                              <i class="fas fa-percentage text-white text-xs"></i>
+                                                          </div>
+                                                          <div>
+                                                              <p class="font-medium text-gray-900 dark:text-white text-sm">${dist.name}</p>
+                                                              <p class="text-xs text-gray-500 dark:text-gray-400">${dist.percentage}%</p>
+                                                          </div>
+                                                      </div>
+                                                      <span class="font-bold text-purple-600 dark:text-purple-400">${dist.amount.toLocaleString()}</span>
+                                                  </div>
+                                              `).join('')}
+                                          </div>
+                                      </div>
+                                  ` : `
+                                      <div class="bg-yellow-50 dark:bg-yellow-900/20 rounded-xl p-4">
+                                          <div class="flex items-center space-x-2 text-yellow-700 dark:text-yellow-300">
+                                              <i class="fas fa-info-circle"></i>
+                                              <span class="text-sm">No percentage-based workers to distribute to</span>
+                                          </div>
+                                      </div>
+                                  `}
+                              </div>
+                          `;
+                      }).join('');
+                  }
+
+                  deleteRevenue(id) {
+                      const revenue = this.revenues.find(r => r.id === id);
+                      if (!revenue) return;
+
+                      if (confirm(`آیا مطمئن هستید که می‌خواهید این درآمد ${revenue.amount.toLocaleString()} تومان را حذف کنید؟`)) {
+                          this.revenues = this.revenues.filter(r => r.id !== id);
+                          this.updateWorkerStats();
+                          this.saveData();
+                          this.renderRevenue();
+                          this.renderWorkers();
+                          this.renderPayments();
+                          this.updateDashboardStats();
+                          this.renderDashboard();
+                          this.showToast('موفقیت', 'درآمد با موفقیت حذف شد', 'success');
+                      }
+                  }
+
+                  renderAnalytics() {
+                      this.renderWorkerPerformance();
+                      this.renderRevenueBreakdown();
+                      this.renderEfficiencyMetrics();
+                  }
+
+                  renderWorkerPerformance() {
+                      const container = document.getElementById('workerPerformance');
+                      if (this.workers.length === 0) {
+                          container.innerHTML = '<p class="text-gray-500 dark:text-gray-400">No workers to analyze</p>';
+                          return;
+                      }
+
+                      const sortedWorkers = [...this.workers].sort((a, b) => b.totalEarned - a.totalEarned);
+
+                      container.innerHTML = sortedWorkers.map(worker => {
+                          const efficiency = worker.daysWorked > 0 ? (worker.totalEarned / worker.daysWorked) : 0;
+                          const paymentRate = worker.totalEarned > 0 ? (worker.totalPaid / worker.totalEarned) * 100 : 0;
+
+                          return `
+                              <div class="flex items-center justify-between p-3 bg-white/30 dark:bg-gray-700/30 rounded-lg">
+                                  <div class="flex items-center space-x-3">
+                                      <div class="w-10 h-10 bg-gradient-to-r ${worker.type === 'percentage' ? 'from-purple-500 to-pink-500' : 'from-blue-500 to-cyan-500'} rounded-lg flex items-center justify-center">
+                                          <i class="fas ${worker.type === 'percentage' ? 'fa-percentage' : 'fa-calendar-day'} text-white text-sm"></i>
+                                      </div>
+                                      <div>
+                                          <p class="font-medium text-gray-900 dark:text-white">${worker.name}</p>
+                                          <p class="text-xs text-gray-500 dark:text-gray-400">
+                                              ${worker.daysWorked} days • ${efficiency.toLocaleString()} avg/day
+                                          </p>
+                                      </div>
+                                  </div>
+                                  <div class="text-right">
+                                      <p class="font-bold text-gray-900 dark:text-white">${worker.totalEarned.toLocaleString()}</p>
+                                      <div class="flex items-center space-x-2">
+                                          <div class="w-16 bg-gray-200 dark:bg-gray-600 rounded-full h-2">
+                                              <div class="bg-green-500 h-2 rounded-full" style="width: ${Math.min(paymentRate, 100)}%"></div>
+                                          </div>
+                                          <span class="text-xs text-gray-500 dark:text-gray-400">${paymentRate.toFixed(0)}%</span>
+                                      </div>
+                                  </div>
+                              </div>
+                          `;
+                      }).join('');
+                  }
+
+                  renderRevenueBreakdown() {
+                      const container = document.getElementById('revenueBreakdown');
+                      const totalRevenue = this.revenues.reduce((sum, r) => sum + r.amount, 0);
+                      const totalDistributed = this.workers
+                          .filter(w => w.type === 'percentage')
+                          .reduce((sum, w) => sum + w.totalEarned, 0);
+                      const totalWages = this.workers
+                          .filter(w => w.type === 'daily')
+                          .reduce((sum, w) => sum + w.totalEarned, 0);
+
+                      if (totalRevenue === 0) {
+                          container.innerHTML = '<p class="text-gray-500 dark:text-gray-400">No revenue data available</p>';
+                          return;
+                      }
+
+                      const remaining = totalRevenue - totalDistributed;
+
+                      container.innerHTML = `
+                          <div class="space-y-3">
+                              <div class="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                                  <div class="flex items-center space-x-2">
+                                      <i class="fas fa-chart-line text-green-500"></i>
+                                      <span class="text-sm text-green-700 dark:text-green-300">Total Revenue</span>
+                                  </div>
+                                  <span class="font-bold text-green-600 dark:text-green-400">${totalRevenue.toLocaleString()}</span>
+                              </div>
+                              <div class="flex items-center justify-between p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                                  <div class="flex items-center space-x-2">
+                                      <i class="fas fa-percentage text-purple-500"></i>
+                                      <span class="text-sm text-purple-700 dark:text-purple-300">Distributed (Percentage)</span>
+                                  </div>
+                                  <span class="font-bold text-purple-600 dark:text-purple-400">${totalDistributed.toLocaleString()}</span>
+                              </div>
+                              <div class="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                                  <div class="flex items-center space-x-2">
+                                      <i class="fas fa-calendar-day text-blue-500"></i>
+                                      <span class="text-sm text-blue-700 dark:text-blue-300">Daily Wages</span>
+                                  </div>
+                                  <span class="font-bold text-blue-600 dark:text-blue-400">${totalWages.toLocaleString()}</span>
+                              </div>
+                              <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                                  <div class="flex items-center space-x-2">
+                                      <i class="fas fa-wallet text-gray-500"></i>
+                                      <span class="text-sm text-gray-700 dark:text-gray-300">Remaining</span>
+                                  </div>
+                                  <span class="font-bold text-gray-600 dark:text-gray-400">${remaining.toLocaleString()}</span>
+                              </div>
+                          </div>
+                      `;
+                  }
+
+                  renderEfficiencyMetrics() {
+                      const container = document.getElementById('efficiencyMetrics');
+                      const totalDays = this.workDays.length;
+                      const totalWorkers = this.workers.length;
+                      const totalRevenue = this.revenues.reduce((sum, r) => sum + r.amount, 0);
+                      const totalPaid = this.payments.reduce((sum, p) => sum + p.amount, 0);
+
+                      const avgRevenuePerDay = totalDays > 0 ? totalRevenue / totalDays : 0;
+                      const paymentEfficiency = totalRevenue > 0 ? (totalPaid / totalRevenue) * 100 : 0;
+
+                      container.innerHTML = `
+                          <div class="bg-white/30 dark:bg-gray-700/30 rounded-lg p-4">
+                              <div class="flex items-center space-x-2 mb-2">
+                                  <i class="fas fa-chart-bar text-blue-500"></i>
+                                  <span class="text-sm text-gray-600 dark:text-gray-400">Avg Revenue/Day</span>
+                              </div>
+                              <p class="text-xl font-bold text-blue-600 dark:text-blue-400">${avgRevenuePerDay.toLocaleString()}</p>
+                          </div>
+                          <div class="bg-white/30 dark:bg-gray-700/30 rounded-lg p-4">
+                              <div class="flex items-center space-x-2 mb-2">
+                                  <i class="fas fa-percentage text-green-500"></i>
+                                  <span class="text-sm text-gray-600 dark:text-gray-400">Payment Rate</span>
+                              </div>
+                              <p class="text-xl font-bold text-green-600 dark:text-green-400">${paymentEfficiency.toFixed(1)}%</p>
+                          </div>
+                      `;
+                  }
+
+                  updateAnalytics(timeframe) {
+                      // Filter data based on timeframe
+                      const cutoffDate = new Date();
+                      cutoffDate.setDate(cutoffDate.getDate() - parseInt(timeframe));
+
+                      // Re-render analytics with filtered data
+                      this.renderAnalytics();
+                  }
+
+                  filterByDateRange() {
+                      const fromDate = document.getElementById('dateFrom').value;
+                      const toDate = document.getElementById('dateTo').value;
+
+                      if (!fromDate || !toDate) {
+                          this.showToast('خطا', 'لطفاً هر دو تاریخ را انتخاب کنید', 'error');
+                          return;
+                      }
+
+                      if (new Date(fromDate) > new Date(toDate)) {
+                          this.showToast('خطا', 'تاریخ شروع نمی‌تواند بعد از تاریخ پایان باشد', 'error');
+                          return;
+                      }
+
+                      // Filter and re-render schedule
+                      this.currentPage = 1;
+                      this.renderSchedule();
+                      this.showToast('موفقیت', 'فیلتر تاریخ اعمال شد', 'success');
+                  }
+
+                  checkNotifications() {
+                      const pendingPayments = this.workers.filter(w => (w.totalEarned - w.totalPaid) > 0).length;
+                      const badge = document.getElementById('notificationBadge');
+
+                      if (pendingPayments > 0) {
+                          badge.textContent = pendingPayments;
+                          badge.classList.remove('hidden');
+                      } else {
+                          badge.classList.add('hidden');
+                      }
+                  }
+
+                  exportData(type) {
+                      let data, filename;
+                      const date = new Date().toISOString().split('T')[0];
+
+                      switch(type) {
+                          case 'workers':
+                              data = this.workers.map(w => ({
+                                  'نام': w.name,
+                                  'نوع': w.type === 'percentage' ? 'درصدی' : 'روزانه',
+                                  'مقدار': w.amount,
+                                  'روزهای کار': w.daysWorked,
+                                  'کل درآمد': w.totalEarned,
+                                  'کل پرداخت': w.totalPaid,
+                                  'باقی‌مانده': w.totalEarned - w.totalPaid
+                              }));
+                              filename = `workers-${date}.json`;
+                              break;
+                          case 'payments':
+                              data = this.payments.map(p => {
+                                  const worker = this.workers.find(w => w.id === p.workerId);
+                                  return {
+                                      'تاریخ': new Date(p.date).toLocaleDateString('fa-IR'),
+                                      'کارگر': worker?.name || 'نامشخص',
+                                      'مبلغ': p.amount,
+                                      'توضیحات': p.description || ''
+                                  };
+                              });
+                              filename = `payments-${date}.json`;
+                              break;
+                          case 'analytics':
+                              data = {
+                                  'آمار کلی': {
+                                      'تعداد کارگران': this.workers.length,
+                                      'تعداد روزهای کار': this.workDays.length,
+                                      'کل درآمد': this.revenues.reduce((sum, r) => sum + r.amount, 0),
+                                      'کل پرداخت‌ها': this.payments.reduce((sum, p) => sum + p.amount, 0)
+                                  },
+                                  'کارگران': this.workers,
+                                  'روزهای کار': this.workDays,
+                                  'پرداخت‌ها': this.payments,
+                                  'درآمدها': this.revenues
+                              };
+                              filename = `analytics-${date}.json`;
+                              break;
+                      }
+
+                      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = filename;
+                      a.click();
+                      URL.revokeObjectURL(url);
+
+                      this.showToast('موفقیت', 'فایل با موفقیت دانلود شد', 'success');
+                  }
+
+                  showBulkPayment() {
+                      const workersWithDebt = this.workers.filter(w => (w.totalEarned - w.totalPaid) > 0);
+                      if (workersWithDebt.length === 0) {
+                          this.showToast('اطلاع', 'هیچ کارگری بدهی ندارد', 'info');
+                          return;
+                      }
+
+                      const totalDebt = workersWithDebt.reduce((sum, w) => sum + (w.totalEarned - w.totalPaid), 0);
+                      const message = `آیا می‌خواهید به همه کارگران بدهکار (${workersWithDebt.length} نفر) پرداخت کنید؟\nکل مبلغ: ${totalDebt.toLocaleString()} تومان`;
+
+                      if (confirm(message)) {
+                          workersWithDebt.forEach(worker => {
+                              const amount = worker.totalEarned - worker.totalPaid;
+                              const payment = {
+                                  id: Date.now() + Math.random(),
+                                  workerId: worker.id,
+                                  amount,
+                                  description: 'پرداخت گروهی',
+                                  date: new Date().toISOString()
+                              };
+                              this.payments.push(payment);
+                          });
+
+                          this.updateWorkerStats();
+                          this.saveData();
+                          this.renderWorkers();
+                          this.renderPayments();
+                          this.updateDashboardStats();
+                          this.renderDashboard();
+                          this.showToast('موفقیت', `پرداخت گروهی به ${workersWithDebt.length} کارگر انجام شد`, 'success');
+                      }
+                  }
+
+                  showCalendarView() {
+                      this.showToast('اطلاع', 'نمای تقویم در نسخه بعدی اضافه خواهد شد', 'info');
+                  }
+
+                  showNotifications() {
+                      const workersWithDebt = this.workers.filter(w => (w.totalEarned - w.totalPaid) > 0);
+                      if (workersWithDebt.length === 0) {
+                          this.showToast('اطلاع', 'هیچ اعلان جدیدی وجود ندارد', 'info');
+                          return;
+                      }
+
+                      const message = `${workersWithDebt.length} کارگر در انتظار پرداخت هستند:\n${workersWithDebt.map(w => `• ${w.name}: ${(w.totalEarned - w.totalPaid).toLocaleString()} تومان`).join('\n')}`;
+                      alert(message);
+                  }
+
+                  saveData() {
+                      try {
+                          localStorage.setItem('workers', JSON.stringify(this.workers));
+                          localStorage.setItem('workDays', JSON.stringify(this.workDays));
+                          localStorage.setItem('payments', JSON.stringify(this.payments));
+                          localStorage.setItem('revenues', JSON.stringify(this.revenues));
+                          this.checkNotifications();
+                          console.log('داده‌ها با موفقیت ذخیره شدند');
+                      } catch (error) {
+                          console.error('خطا در ذخیره‌سازی داده‌ها:', error);
+                          this.showToast('خطا', 'خطا در ذخیره‌سازی داده‌ها. لطفاً دوباره تلاش کنید.', 'error');
+                      }
+                  }
+              }
+
+              // Initialize the system
+              const wms = new EnhancedWorkerManagementSystem();
+
+              // Make functions globally available
+              window.wms = wms;
+      (function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96f29d7792a5eda6',t:'MTc1NTE5NzE4OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();
+    </script>
+  </body>
+</html>
